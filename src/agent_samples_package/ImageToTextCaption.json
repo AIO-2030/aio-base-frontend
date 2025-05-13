@@ -1,0 +1,15 @@
+{
+  "name": "ImageToTextCaption",
+  "input": [
+    {
+      "keyname": "image_blob",
+      "type": "blob"
+    }
+  ],
+  "output": [
+    {
+      "name": "caption_text",
+      "type": "string"
+    }
+  ]
+}

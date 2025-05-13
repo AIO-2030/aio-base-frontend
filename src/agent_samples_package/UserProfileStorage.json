@@ -1,0 +1,19 @@
+{
+  "name": "UserProfileStorage",
+  "input": [
+    {
+      "keyname": "user_id",
+      "type": "string"
+    },
+    {
+      "keyname": "profile_data",
+      "type": "json"
+    }
+  ],
+  "output": [
+    {
+      "name": "storage_status",
+      "type": "string"
+    }
+  ]
+}

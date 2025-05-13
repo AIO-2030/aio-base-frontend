@@ -1,0 +1,26 @@
+[
+    {
+        "match": "**/*",
+        "headers": {
+            // CORS headers
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Max-Age": "86400",
+
+            // Security: The Content Security Policy (CSP) given below aims at working with many apps rather than providing maximal security.
+            "Content-Security-Policy": "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; connect-src 'self' https: blob: ws: http://8.141.81.75:8001/upload/mcp; font-src 'self' https:; object-src 'none'; media-src 'self' https: https://8.141.81.75:8001/upload/mcp blob: mediastream:; frame-src 'self' https:; worker-src 'self' blob:;",
+
+            // Security: The permissions policy disables all features for security reasons.
+            "Permissions-Policy": "accelerometer=*, ambient-light-sensor=*, autoplay=*, battery=*, camera=*, cross-origin-isolated=*, display-capture=*, document-domain=*, encrypted-media=*, execution-while-not-rendered=*, execution-while-out-of-viewport=*, fullscreen=*, geolocation=*, gyroscope=*, keyboard-map=*, magnetometer=*, microphone=*, midi=*, navigation-override=*, payment=(), picture-in-picture=*, publickey-credentials-get=*, screen-wake-lock=*, sync-xhr=*, usb=*, web-share=*, xr-spatial-tracking=*, clipboard-read=*, clipboard-write=*, gamepad=*, speaker-selection=*, conversion-measurement=*, focus-without-user-activation=*, hid=*, idle-detection=*, interest-cohort=*, serial=*, sync-script=*, trust-token-redemption=*, window-placement=*, vertical-scroll=*",
+
+            // Security headers
+            "X-Frame-Options": "SAMEORIGIN",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+            "X-Content-Type-Options": "nosniff",
+            "X-XSS-Protection": "1; mode=block"
+        }
+    }
+] 

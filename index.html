@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>open-collab-space</title>
+    <meta name="description" content="Lovable Generated Project" />
+    <meta name="author" content="Lovable" />
+    <meta property="og:image" content="/og-image.png" />
+    <!-- Security: Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co blob:;
+      connect-src 'self' blob:
+        http://localhost:* https://localhost:*
+        http://127.0.0.1:* https://127.0.0.1:*
+        http://8.141.81.75:* https://8.141.81.75:*
+        http://8.141.81.75:8001 https://8.141.81.75:8001
+        https://icp0.io https://*.icp0.io
+        https://icp-api.io https://ic0.app https://*.ic0.app
+        https://openapi.emchub.ai https://*.emchub.ai
+        https://api.siliconflow.cn https://cdn.gpteng.co
+        http://162.218.231.180:* https://162.218.231.180:*
+        http://18.167.51.1:* https://18.167.51.1:*
+        ws: wss:;
+      style-src 'self' 'unsafe-inline';
+      img-src 'self' data: blob:;
+      font-src 'self';
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+      worker-src 'self' blob:;
+      media-src 'self' blob: mediastream:;">
+    <script>
+      // Register both service workers with proper error handling
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          // Register the CORS proxy service worker first with a higher priority
+          navigator.serviceWorker.register('/cors-worker.js', {scope: '/'})
+            .then(function(registration) {
+              console.log('CORS proxy service worker registration successful with scope:', registration.scope);
+            })
+            .catch(function(error) {
+              console.log('CORS proxy service worker registration failed:', error);
+            });
+            
+          // Then register the main service worker
+          navigator.serviceWorker.register('/service-worker.js')
+            .then(function(registration) {
+              console.log('Main ServiceWorker registration successful with scope:', registration.scope);
+            })
+            .catch(function(error) {
+              console.log('Main ServiceWorker registration failed:', error);
+            });
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

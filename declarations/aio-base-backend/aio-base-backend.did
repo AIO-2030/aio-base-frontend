@@ -1,0 +1,209 @@
+type Platform = variant {
+  Windows;
+  Linux;
+  Both;
+};
+
+type WorkStatus = variant {
+  Todo;
+  InProgress;
+  Completed;
+  Cancelled;
+};
+
+type TraceStatus = variant {
+  Ok;
+  Recall;
+  Fail;
+};
+
+type IOData = record {
+  data_type: text;
+  value: text;
+};
+
+type CallItem = record {
+  id: nat64;
+  protocol: text;
+  agent: text;
+  call_type: text;
+  method: text;
+  inputs: vec IOData;  // Changed from input to inputs (array)
+  outputs: vec IOData; // Changed from output to outputs (array)
+  status: text;
+};
+
+type TraceItem = record {
+  id: nat64;
+  trace_id: text;
+  owner: text;
+  created_at: nat64;
+  updated_at: nat64;
+  calls: vec CallItem;
+  metadata: opt text;
+};
+
+type AgentItem = record {
+  id: nat64;
+  name: text;
+  description: text;
+  author: text;
+  owner: text;
+  platform: opt Platform;
+  git_repo: text;
+  homepage: opt text;
+  input_params: opt text;
+  output_example: opt text;
+  image_url: opt text;
+  exec_file_url: opt text;
+  version: text;
+};
+
+type McpItem = record {
+  id: nat64;
+  name: text;
+  description: text;
+  author: text;
+  owner: text;
+  git_repo: text;
+  exec_file:opt text;
+  homepage: opt text;
+  remote_endpoint: opt text;
+  mcp_type: text;
+  community_body: opt text;
+  resources: bool;
+  prompts: bool;
+  tools: bool;
+  sampling: bool;
+};
+
+type WorkItem = record {
+  id: nat64;
+  title: text;
+  description: text;
+  status: WorkStatus;
+  created_at: nat64;
+  updated_at: nat64;
+  owner: text;
+  assigned_to: opt text;
+  tags: vec text;
+  metadata: opt text;
+};
+type SchemaProperty = record {
+  property_type: text;
+  description: opt text;
+  default: opt text;
+  enum_values: opt vec text;
+};
+
+type InputSchema = record {
+  schema_type: text;
+  properties: vec record { text; SchemaProperty };
+};
+
+type Method = record {
+  name: text;
+  description: text;
+  required_params: opt vec text;
+  input_schema: opt InputSchema;
+};
+
+type Source = record {
+  author: text;
+  version: text;
+  github: text;
+};
+
+type AioIndex = record {
+  id: text;
+  description: text;
+  author: text;
+  version: text;
+  github: text;
+  transport: vec text;
+  methods: vec Method;
+  source: Source;
+  keywords: vec text;
+  scenarios: vec text;
+};
+
+type InvertedIndexItem = record {
+    keyword: text;
+    keyword_group: text;
+    mcp_name: text;
+    source_field: text;
+    confidence: float32;
+    standard_match: text;
+};
+
+service : {
+  // Existing service
+  "greet": (text) -> (text) query;
+  
+  // Agent Asset API
+  "get_agent_item": (nat64) -> (opt AgentItem) query;
+  "get_all_agent_items": () -> (vec AgentItem) query;
+  "get_user_agent_items": () -> (vec AgentItem) query;
+  "get_user_agent_items_paginated": (nat64, nat64) -> (vec AgentItem) query;
+  "get_agent_items_paginated": (nat64, nat64) -> (vec AgentItem) query;
+  "get_agent_item_by_name": (text) -> (opt AgentItem) query;
+  "add_agent_item": (AgentItem,text) -> (variant { Ok: nat64; Err: text });
+  "update_agent_item": (nat64, AgentItem) -> (variant { Ok; Err: text });
+  
+  // MCP Asset API
+  "get_mcp_item": (nat64) -> (opt McpItem) query;
+  "get_all_mcp_items": () -> (vec McpItem) query;
+  "get_user_mcp_items": () -> (vec McpItem) query;
+  "get_user_mcp_items_paginated": (nat64, nat64) -> (vec McpItem) query;
+  "get_mcp_items_paginated": (nat64, nat64) -> (vec McpItem) query;
+  "get_mcp_item_by_name": (text) -> (opt McpItem) query;
+  "add_mcp_item": (McpItem,text) -> (variant { Ok: nat64; Err: text });
+  "update_mcp_item": (nat64, McpItem) -> (variant { Ok; Err: text });
+  
+  // Work Ledger API - Trace System
+  "get_trace": (nat64) -> (opt TraceItem) query;
+  "get_trace_by_id": (text) -> (opt TraceItem) query;
+  "get_user_traces": () -> (vec TraceItem) query;
+  "get_user_traces_paginated": (nat64, nat64) -> (vec TraceItem) query;
+  "get_traces_paginated": (nat64, nat64) -> (vec TraceItem) query;
+  "add_trace": (TraceItem) -> (variant { Ok: nat64; Err: text });
+
+  // AIO Protocol Index API
+  "create_aio_index_from_json": (text, text) -> (variant { Ok; Err: text });
+  "get_aio_index": (text) -> (opt AioIndex) query;
+  "get_all_aio_indices": () -> (vec AioIndex) query;
+  "get_aio_indices_paginated": (nat64, nat64) -> (vec AioIndex) query;
+  "search_aio_indices_by_keyword": (text) -> (vec AioIndex) query;
+  "update_aio_index": (text, text) -> (variant { Ok; Err: text });
+  "delete_aio_index": (text) -> (variant { Ok; Err: text });
+  "export_aio_index_to_json": (text) -> (variant { Ok: text; Err: text }) query;
+  "get_aio_indices_count": () -> (nat64) query;
+
+  // Store inverted index
+  store_inverted_index: (text,text) -> (variant { Ok; Err: text });
+
+  // Get all inverted index items
+  get_all_inverted_index_items: () -> (text) query;
+
+  // Get all keywords
+  get_all_keywords: () -> (text) query;
+
+  // Find index items by keyword
+  find_inverted_index_by_keyword: (text) -> (text) query;
+
+  // Find index items by keyword group
+  find_inverted_index_by_group: (text) -> (text) query;
+
+  // Find index items by MCP name
+  find_inverted_index_by_mcp: (text) -> (text) query;
+
+  // Find index items by confidence threshold
+  find_inverted_index_by_confidence: (float32) -> (text) query;
+
+  // Find index items by multiple keywords with confidence threshold
+  find_inverted_index_by_keywords: (vec text, float32) -> (text) query;
+
+  // Delete all index items for a specific MCP
+  delete_inverted_index_by_mcp: (text) -> (variant { Ok; Err: text });
+  
+}

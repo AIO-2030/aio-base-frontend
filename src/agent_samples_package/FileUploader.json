@@ -1,0 +1,19 @@
+{
+  "name": "FileUploader",
+  "input": [
+    {
+      "keyname": "file_blob",
+      "type": "blob"
+    },
+    {
+      "keyname": "target_path",
+      "type": "string"
+    }
+  ],
+  "output": [
+    {
+      "name": "upload_status",
+      "type": "string"
+    }
+  ]
+}

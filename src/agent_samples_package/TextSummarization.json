@@ -1,0 +1,15 @@
+{
+  "name": "TextSummarization",
+  "input": [
+    {
+      "keyname": "text_content",
+      "type": "string"
+    }
+  ],
+  "output": [
+    {
+      "name": "summary_text",
+      "type": "string"
+    }
+  ]
+}

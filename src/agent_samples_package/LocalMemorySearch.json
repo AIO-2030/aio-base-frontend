@@ -1,0 +1,19 @@
+{
+  "name": "LocalMemorySearch",
+  "input": [
+    {
+      "keyname": "query_text",
+      "type": "string"
+    },
+    {
+      "keyname": "memory_path",
+      "type": "string"
+    }
+  ],
+  "output": [
+    {
+      "name": "search_result",
+      "type": "json"
+    }
+  ]
+}

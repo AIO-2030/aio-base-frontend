@@ -1,0 +1,97 @@
+
+/* Tailwind Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Base Styles */
+@layer base {
+  body {
+    @apply text-foreground bg-background;
+  }
+  
+  html {
+    @apply scroll-smooth;
+  }
+  
+  /* Custom styling for file inputs */
+  input[type="file"]::file-selector-button {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 border-0 rounded-md px-4 py-2;
+  }
+  
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 0 0% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217 19% 27%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 19% 27%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217 19% 27%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 19% 27%;
+    --input: 217 19% 27%;
+    --ring: 224 71.4% 4.1%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 217 19% 27%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 19% 27%;
+    --sidebar-ring: 224 71.4% 4.1%;
+  }
+}
+
+/* Custom Component Styles */
+@layer components {
+  /* Add reusable component styles here */
+  .form-container {
+    @apply space-y-6 p-6 rounded-lg border;
+  }
+  
+  .section-container {
+    @apply py-8 px-4 md:px-6;
+  }
+  
+  .web3-gradient-bg {
+    @apply bg-background;
+    background-image: radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.05) 0px, transparent 50%),
+                       radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
+  }
+  
+  .web3-glow {
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+  }
+  
+  .nav-link {
+    @apply px-3 py-2 text-muted-foreground rounded-md transition-colors hover:text-foreground hover:bg-secondary/40;
+  }
+  
+  .nav-link.active {
+    @apply bg-primary/10 text-primary font-medium;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:border-primary/20 hover:bg-primary/5;
+  }
+  
+  .page-transition {
+    @apply animate-fade-in;
+  }
+}
+
+/* Custom Utility Styles */
+@layer utilities {
+  /* Add custom utility classes here */
+  .text-balance {
+    text-wrap: balance;
+  }
+}
