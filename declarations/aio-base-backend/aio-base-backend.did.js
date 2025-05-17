@@ -206,6 +206,11 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'greet' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
+    'revert_Index_find_by_keywords_strategy' : IDL.Func(
+        [IDL.Vec(IDL.Text)],
+        [IDL.Text],
+        ['query'],
+      ),
     'search_aio_indices_by_keyword' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(AioIndex)],

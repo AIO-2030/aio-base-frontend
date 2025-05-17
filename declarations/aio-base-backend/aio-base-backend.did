@@ -131,6 +131,7 @@ type InvertedIndexItem = record {
     keyword: text;
     keyword_group: text;
     mcp_name: text;
+    method_name: text;
     source_field: text;
     confidence: float32;
     standard_match: text;
@@ -206,4 +207,5 @@ service : {
   // Delete all index items for a specific MCP
   delete_inverted_index_by_mcp: (text) -> (variant { Ok; Err: text });
   
+  revert_Index_find_by_keywords_strategy: (vec text) -> (text) query;
 }

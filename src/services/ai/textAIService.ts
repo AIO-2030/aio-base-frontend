@@ -1,6 +1,6 @@
 import { toast } from "@/components/ui/use-toast";
 import { AttachedFile } from "@/components/chat/ChatFileUploader";
-import { generateEMCNetworkResponse,generateActionEMCNetWorkResponse, DEFAULT_MODEL, generateSampleofAIOEntity, generateInvertedIndex, generateIntentDetection, generateMcp2AIOOutputAdapter } from "./emcAIService";
+import { generateEMCNetworkResponse,generateActionEMCNetWorkResponse, DEFAULT_MODEL, generateSampleofAIOEntity, generateInvertedIndex, generateIntentDetection, generateMcp2AIOOutputAdapter, realtimeStepKeywordsMapping, AI_MODELS } from "./emcAIService";
 import { generateMockAIResponse } from "./mockAIService";
 import { generateRealAIResponse } from "./openAIService";
 import { ChatMessage, EMCModel } from "../emcNetworkService";
@@ -367,6 +367,64 @@ export async function handleMcpResponse(
     // Use real OpenAI API if both network services and mock are disabled
     console.log('[AI-AGENT] 🧠 Using OpenAI service for MCP adapter generation (Network services and mock disabled)');
     return await generateRealAIResponse(`Generate AIO protocol output based on MCP JSON: ${mcpJson}`);
+  }
+}
+
+/**
+ * Handle realtime step keywords mapping between intent steps and MCP keywords
+ */
+export async function handleRealtimeStepKeywordsMapping(
+  goals: string,
+  intentSteps: Array<{ step: number; keywords: string[] }>,
+  candidateKeywords: string[],
+  useEMCNetwork: boolean = true,
+  useMockApi: boolean = true,
+  model: EMCModel = DEFAULT_MODEL
+): Promise<string> {
+  console.log(`[AI-AGENT] 🔄 Starting realtime keywords mapping for ${intentSteps.length} steps`);
+  
+  // Try EMC Network/SiliconFlow first if enabled
+  if (useEMCNetwork) {
+    try {
+      console.log(`[AI-AGENT] 🌐 Network services are enabled, attempting to map keywords using model: ${model}`);
+      // Use the realtimeStepKeywordsMapping implementation
+      return await realtimeStepKeywordsMapping(goals, intentSteps, candidateKeywords, model);
+    } catch (error) {
+      console.warn("[AI-AGENT] ⚠️ Network services completely failed for keywords mapping, falling back to alternative:", error);
+      
+      // Only reach this if something catastrophic happened in the network services
+      if (useMockApi) {
+        console.log('[AI-AGENT] 🔄 Falling back to mock AI service for keywords mapping');
+        toast({
+          title: "Network services error",
+          description: "The service encountered an unexpected error. Using mock AI instead for keywords mapping.",
+          variant: "destructive"
+        });
+        // Fall back to mock service with a sample mapping output
+        return JSON.stringify(candidateKeywords.slice(0, intentSteps.length));
+      } else {
+        console.log('[AI-AGENT] 🔄 Falling back to OpenAI service for keywords mapping');
+        toast({
+          title: "Network services error",
+          description: "The service encountered an unexpected error. Using OpenAI instead for keywords mapping.",
+          variant: "destructive"
+        });
+        // Fall back to OpenAI with keywords mapping request
+        return await generateRealAIResponse(
+          `Map intent steps ${JSON.stringify(intentSteps)} to candidate keywords ${JSON.stringify(candidateKeywords)}`
+        );
+      }
+    }
+  } else if (useMockApi) {
+    // Use mock API if network services are disabled and mock is enabled
+    console.log('[AI-AGENT] 🎭 Using mock AI service for keywords mapping (Network services disabled)');
+    return JSON.stringify(candidateKeywords.slice(0, intentSteps.length));
+  } else {
+    // Use real OpenAI API if both network services and mock are disabled
+    console.log('[AI-AGENT] 🧠 Using OpenAI service for keywords mapping (Network services and mock disabled)');
+    return await generateRealAIResponse(
+      `Map intent steps ${JSON.stringify(intentSteps)} to candidate keywords ${JSON.stringify(candidateKeywords)}`
+    );
   }
 }
 

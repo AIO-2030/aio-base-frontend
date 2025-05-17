@@ -48,6 +48,7 @@ export interface InvertedIndexItem {
   'standard_match' : string,
   'keyword_group' : string,
   'mcp_name' : string,
+  'method_name' : string,
   'source_field' : string,
   'keyword' : string,
   'confidence' : number,
@@ -191,6 +192,10 @@ export interface _SERVICE {
   'get_user_traces' : ActorMethod<[], Array<TraceItem>>,
   'get_user_traces_paginated' : ActorMethod<[bigint, bigint], Array<TraceItem>>,
   'greet' : ActorMethod<[string], string>,
+  'revert_Index_find_by_keywords_strategy' : ActorMethod<
+    [Array<string>],
+    string
+  >,
   'search_aio_indices_by_keyword' : ActorMethod<[string], Array<AioIndex>>,
   'store_inverted_index' : ActorMethod<
     [string, string],

@@ -61,10 +61,11 @@ CRITICAL RESPONSE RULES:
 4. DO NOT include any text outside the JSON object
 5. The entire response must be a single, valid JSON object that can be parsed
 6. All chat messages, greetings, questions, and natural language responses MUST be placed in the "response" field
-7. The "response" field is the ONLY place where chat messages should appear
-8. Never include chat messages or natural language text outside of the "response" field
-9. The "intent_analysis" and "execution_plan" fields should only contain structured data, not chat messages
-10. DO NOT split your response into multiple JSON blocks
+7. In the "response" field, you need to tell user your opinions about the goal, and the plan you will take, and the reason why you choose the plan
+8. The "response" field is the ONLY place where chat messages should appear
+9. Never include chat messages or natural language text outside of the "response" field
+10. The "intent_analysis" and "execution_plan" fields should only contain structured data, not chat messages
+11. DO NOT split your response into multiple JSON blocks
 
 IMPORTANT JSON FORMATTING RULES:
 1. All values must be properly quoted:

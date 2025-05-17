@@ -233,18 +233,66 @@ export const getAllInnerKeywords = async (): Promise<string[]> => {
       const result = await actor.get_all_keywords();
       console.log(`[CANISTER_CALL] get_all_keywords - Output:`, result);
       
-      // Parse the JSON string result into an array of InvertedIndexItem
-      const items: InvertedIndexItem[] = JSON.parse(result);
-      
-      // Extract unique keywords
-      const keywords = [...new Set(items.map(item => item.keyword))];
-      return keywords;
+      // Ensure we have an array of strings
+      if (typeof result === 'string') {
+        return JSON.parse(result);
+      }
+      return result;
     } catch (error) {
       console.error(`[CANISTER_ERROR] get_all_inverted_index_items failed:`, error);
       throw error;
     }
   });
 };
+
+/**
+ * Fetch MCP name and method name from inverted index by keyword
+ * @param keyword The keyword to search for
+ * @returns Promise resolving to the MCP name or undefined if not found
+ */
+export const fetchMcpAndMethodName = async (keywords: string[]): Promise<{mcpName: string, methodName: string} | undefined> => {
+  return loggedCanisterCall('fetchMcpAndMethodName', { keywords }, async () => {
+    console.log(`[CANISTER_CALL] find_inverted_index_by_keyword - Input: keywords=${keywords}`);
+    try {
+      const actor = await getActor();
+      const result = await actor.revert_Index_find_by_keywords_strategy(keywords);
+      console.log(`[CANISTER_CALL] find_inverted_index_by_keyword - Output:`, result);
+      
+      // Handle empty object response
+      if (result === '{}' || result === '[]' || !result) {
+        console.warn(`[CANISTER_WARNING] Empty response received for keywords: ${keywords}`);
+        return undefined;
+      }
+
+      let items: InvertedIndexItem[];
+      try {
+        items = JSON.parse(result);
+      } catch (parseError) {
+        console.warn(`[CANISTER_WARNING] Failed to parse response for keywords: ${keywords}`, parseError);
+        return undefined;
+      }
+      
+      // Check if we have any results
+      if (!Array.isArray(items) || items.length === 0) {
+        console.warn(`[CANISTER_WARNING] No inverted index items found for keywords: ${keywords}`);
+        return undefined;
+      }
+      
+      // Get the first item's MCP name
+      const mcpName = items[0].mcp_name;
+      console.log(`[CANISTER_CALL] Found MCP name: ${mcpName} for keywords: ${keywords}`);
+
+      const methodName = items[0].method_name;
+      
+      return { mcpName, methodName };
+    } catch (error) {
+      console.warn(`[CANISTER_WARNING] find_inverted_index_by_keyword failed:`, error);
+      return undefined;
+    }
+  });
+};
+
+
 
 
 

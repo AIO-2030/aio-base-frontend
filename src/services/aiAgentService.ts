@@ -8,10 +8,10 @@ import {
   handleMcpResponse
 } from "./ai/textAIService";
 import { processVoiceData as processVoiceAudio } from "./ai/voiceAIService";
-import { DEFAULT_MODEL } from "./ai/emcAIService";
-import { EMCModel } from "./emcNetworkService";
 import { createTrace, addCall, updateCall, handleNetworkError } from "./aio/traceHandler";
 import { createInvertedIndexMessage } from "@/config/aiPrompts";
+import { generateEMCNetworkResponse, generateSampleofAIOEntity, generateInvertedIndex, generateIntentDetection, generateActionEMCNetWorkResponse, generateMcp2AIOOutputAdapter, realtimeStepKeywordsMapping, AI_MODELS, DEFAULT_MODEL } from "./ai/emcAIService";
+import { EMCModel } from "./emcNetworkService";
 
 // Configuration flags
 let useMockApi = true;
@@ -349,4 +349,50 @@ export async function adaptMcp2AI(mcpJson: string): Promise<string> {
     throw error; // Propagate the error to the caller
   }
 }
+
+/**
+ * Map intent steps to MCP keywords in realtime
+ */
+export async function mapRealtimeStepKeywords(
+  goals: string,
+  intentSteps: Array<{ step: number; keywords: string[] }>,
+  candidateKeywords: string[]
+): Promise<string> {
+  const trace_id = createTrace();
+  const call_id = addCall(
+    trace_id,
+    'keywords_mapper',
+    'aio',
+    'stdio',
+    'keywords_mapper::map_keywords',
+    [
+      { type: 'json', value: JSON.stringify(intentSteps) },
+      { type: 'json', value: JSON.stringify(candidateKeywords) }
+    ]
+  );
+  
+  try {
+    // Use the dedicated realtime keywords mapping handler function
+    const response = await realtimeStepKeywordsMapping(
+      goals,
+      intentSteps,
+      candidateKeywords
+    );
+    
+    updateCall(
+      trace_id,
+      call_id,
+      [{ type: 'json', value: 'Keywords mapped successfully' }],
+      'ok'
+    );
+    
+    return response;
+  } catch (error) {
+    console.error("Error mapping keywords:", error);
+    handleNetworkError(trace_id, call_id, error);
+    throw error; // Propagate the error to the caller
+  }
+}
+
+
 

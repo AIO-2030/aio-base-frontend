@@ -52,6 +52,7 @@ interface ParsedData {
   response?: string;
   _sourceContent?: string;
   _sourceRawJson?: string;
+  _cleanedJson?: string;
 }
 
 const TabPanel = (props: any) => {
@@ -78,8 +79,8 @@ const AIResponseCard: React.FC<AIResponseCardProps> = ({
   rawJson
 }) => {
   const [value, setValue] = React.useState(0);
-  const { initProtocolContext, setActiveProtocolContextId, handleProtocolStep, activeProtocolContextId } = useChat();
   const [isExecuting, setIsExecuting] = React.useState(false);
+  const { initProtocolContext, setActiveProtocolContextId, handleProtocolStep, activeProtocolContextId, handleProtocolReset } = useChat();
   const [parsedData, setParsedData] = React.useState<ParsedData | null>(null);
   
   const processedContentRef = React.useRef<{content?: string, rawJson?: string, processed: boolean}>({ processed: false });
@@ -136,7 +137,8 @@ const AIResponseCard: React.FC<AIResponseCardProps> = ({
             execution_plan: parsedJson.execution_plan || { steps: [] },
             response: parsedJson.response || content || "No response available",
             _sourceContent: content,
-            _sourceRawJson: rawJson
+            _sourceRawJson: rawJson,
+            _cleanedJson: fixedJson
           };
           
           setParsedData(result);
@@ -232,7 +234,7 @@ const AIResponseCard: React.FC<AIResponseCardProps> = ({
     }
   }, [content, rawJson]);
   
-  const handleProtocolInit = () => {
+  const handleProtocolInit = async (): Promise<string | null> => {
     console.log('[AIResponseCard] Initializing protocol context');
     if (!parsedData || activeProtocolContextId) {
       console.log('[AIResponseCard] No parsed data or active protocol context');
@@ -256,8 +258,9 @@ const AIResponseCard: React.FC<AIResponseCardProps> = ({
     
     if (operationKeywords.length > 0) {
       console.log('[AIResponseCard] Initializing protocol context with keywords:', operationKeywords);
-      const contextId = initProtocolContext(
+      const contextId = await initProtocolContext(
         content,
+        parsedData._cleanedJson,
         operationKeywords,
         execution_plan
       );
@@ -407,8 +410,14 @@ const AIResponseCard: React.FC<AIResponseCardProps> = ({
 
   const handleExecuteProtocol = async () => {
     let contextId = activeProtocolContextId;
-    if (!contextId) {
-      contextId = handleProtocolInit();
+    const protocolHandler = AIOProtocolHandler.getInstance();
+    
+    if (!contextId || (contextId && protocolHandler.getContext(contextId)?.status === 'finish')) {
+      // If context is finished, reset it first
+      if (contextId) {
+        handleProtocolReset();
+      }
+      contextId = await handleProtocolInit();
     }
     
     if (!contextId) {

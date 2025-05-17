@@ -221,6 +221,9 @@ const ChatContainer = () => {
       const protocolHandler = AIOProtocolHandler.getInstance();
       protocolHandler.deleteContext(activeProtocolContextId);
       
+      // Clear the active protocol context ID
+      setActiveProtocolContextId(null);
+      
       addDirectMessage(`Protocol context ${activeProtocolContextId} has been reset`);
     } else {
       addDirectMessage("No active protocol to reset");

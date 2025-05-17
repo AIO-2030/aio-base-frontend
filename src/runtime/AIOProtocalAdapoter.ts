@@ -258,7 +258,6 @@ export function getMethodRequiredParameters(aioIndex: AIOIndex, methodName: stri
  */
 export function extractStepKeywordsByExecution(jsonStr: string): { step: number; keywords: string[] }[] {
     const steps: { step: number; keywords: string[] }[] = [];
-  
     try {
       const parsed = JSON.parse(jsonStr);
       const intent = parsed?.intent_analysis;
@@ -304,7 +303,8 @@ export function extractStepKeywordsByExecution(jsonStr: string): { step: number;
     } catch (e) {
       console.error("Failed to extract step keywords:", e);
     }
-  
+    console.log("[AIOProtocolAdapter] Extracting step keywords by messageContent:", steps);
+
     return steps;
   }
   

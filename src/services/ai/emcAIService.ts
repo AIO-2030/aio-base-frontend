@@ -4,6 +4,7 @@ import { generateEMCCompletion, ChatMessage, EMCModel } from "../emcNetworkServi
 import { createEMCNetworkMessages, createEMCNetworkSampleMessage, createInvertedIndexMessage, createIntentDetectMessage } from "@/config/aiPrompts";
 import { DialogAction, createActionMessages } from "../speech/tempateconfig/dialogPromptsTemplate";
 import { createAdapterForMcpOutput } from "@/config/aioProtocalOutputAdapterPrompts";
+import { createMatcherForKeywords } from "@/config/realtimeKeywordsMapping";
 
 // Define available models with their display names for better UX
 export const AI_MODELS = [
@@ -95,7 +96,7 @@ export async function generateSampleofAIOEntity(
     let response = await generateEMCCompletion(messages, model);
 
     // Process the response: remove <think>...</think> content
-    if (model === EMCModel.DEEPSEEK_CHAT && response.includes('<think>')) {
+    if (response.includes('<think>')) {
       console.log(`[AI-AGENT] 🧠 Detected thinking process in response, filtering it out`);
 
       // Log the thinking part for debugging
@@ -147,7 +148,7 @@ export async function generateInvertedIndex(
     let response = await generateEMCCompletion(messages, model);
 
     // Process the response: remove <think>...</think> content
-    if (model === EMCModel.DEEPSEEK_CHAT && response.includes('<think>')) {
+    if (response.includes('<think>')) {
       console.log(`[AI-AGENT] 🧠 Detected thinking process in response, filtering it out`);
 
       // Log the thinking part for debugging
@@ -213,7 +214,7 @@ export async function generateIntentDetection(
     let response = await generateEMCCompletion(messages, model);
 
     // Process the response: remove <think>...</think> content
-    if (model === EMCModel.DEEPSEEK_CHAT && response.includes('<think>')) {
+    if (response.includes('<think>')) {
       console.log(`[AI-AGENT] 🧠 Detected thinking process in response, filtering it out`);
 
       // Log the thinking part for debugging
@@ -316,7 +317,7 @@ export async function generateMcp2AIOOutputAdapter(
     let response = await generateEMCCompletion(messages, model);
 
     // Process the response: remove <think>...</think> content
-    if (model === EMCModel.DEEPSEEK_CHAT && response.includes('<think>')) {
+    if (response.includes('<think>')) {
       console.log(`[AI-AGENT] 🧠 Detected thinking process in response, filtering it out`);
 
       // Log the thinking part for debugging
@@ -356,6 +357,84 @@ export async function generateMcp2AIOOutputAdapter(
 
   } catch (error) {
     console.error(`[AI-AGENT] ❌ Error generating AIO protocol output with model ${model}:`, error);
+
+    // Re-throw the error to make it clear that something went wrong
+    throw error;
+  }
+}
+
+/**
+ * Generate realtime step keywords mapping between intent steps and MCP keywords
+ */
+export async function realtimeStepKeywordsMapping(
+  goals: string,
+  intentSteps: Array<{ step: number; keywords: string[] }>,
+  candidateKeywords: string[],
+  model: EMCModel = DEFAULT_MODEL
+): Promise<string> {
+  try {
+    console.log(`[AI-AGENT] 🚀 Preparing realtime keywords mapping request for model: ${model}`);
+
+    // Create the matcher prompt using the intent steps and candidate keywords
+    const matcherPrompt = createMatcherForKeywords(goals,intentSteps, candidateKeywords);
+
+    // Construct the message for the LLM
+    const messages: ChatMessage[] = [
+      {
+        role: "system",
+        content: matcherPrompt
+      }
+    ];
+
+    console.log(`[AI-AGENT] 📤 Sending realtime keywords mapping request`);
+
+    // Call service with specified model
+    let response = await generateEMCCompletion(messages, model);
+
+    // Process the response: remove <think>...</think> content
+    if (response.includes('<think>')) {
+      console.log(`[AI-AGENT] 🧠 Detected thinking process in response, filtering it out`);
+
+      // Log the thinking part for debugging
+      const thinkMatch = response.match(/<think>([\s\S]*?)<\/think>/);
+      if (thinkMatch && thinkMatch[1]) {
+        console.log(`[AI-AGENT] 🧠 DeepSeek thinking process:`, thinkMatch[1].trim());
+      }
+
+      // Remove the thinking part from the response
+      response = response.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+
+      // Remove any leftover separator that might appear after the thinking section
+      const separatorPattern = /^-{10,}$/m;
+      response = response.replace(separatorPattern, '').trim();
+    }
+
+    // Check for and remove code block markers if present
+    if (response.includes('```')) {
+      console.log(`[AI-AGENT] 🧹 Removing code block markers from response`);
+      response = response.replace(/```json\n|```\n|```/g, '');
+    }
+
+    // Validate the response is a valid JSON array
+    try {
+      const parsedResponse = JSON.parse(response);
+      if (!Array.isArray(parsedResponse)) {
+        throw new Error('Invalid response format: expected JSON array');
+      }
+      if (parsedResponse.length !== intentSteps.length) {
+        throw new Error('Invalid response format: array length does not match intent steps length');
+      }
+    } catch (error) {
+      console.error(`[AI-AGENT] ❌ Invalid JSON response:`, error);
+      console.log(`[AI-AGENT] 📥 Error parsed keywords mapping response: (${response})`);
+      throw new Error('Failed to generate valid keywords mapping: invalid JSON format');
+    }
+
+    console.log(`[AI-AGENT-Realtime-Keywords-Mapping] 📥 Received processed keywords mapping (${response})`);
+    return response;
+
+  } catch (error) {
+    console.error(`[AI-AGENT] ❌ Error generating keywords mapping with model ${model}:`, error);
 
     // Re-throw the error to make it clear that something went wrong
     throw error;

@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, FileText, Code, Lightbulb, Zap, Server, LayoutDashboard, Flag, Download } from 'lucide-react';
 import ContactUs from '@/components/ContactUs';
 import FileDownload from '@/components/FileDownload';
+import { toast } from '@/components/ui/use-toast';
 
 interface ProjectCategory {
   id: string;
@@ -122,11 +123,25 @@ const MainMenu = () => {
           Resources
         </h2>
         <div className="mb-4">
-          <FileDownload 
+          <FileDownload
             filepath="/whitepaper/AIO-MCP-v1.2.1.pdf"
             filename="AIO-MCP-Protocol-v1.2.1.pdf"
-            variant="outline"
-            className="w-full justify-start"
+            className="inline-flex items-center justify-start w-full px-4 py-2 text-sm font-medium transition-colors rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
+            onDownloadComplete={(response) => {
+              if (response.success) {
+                toast({
+                  title: "Download Successful",
+                  description: `"${response.filename}" has been downloaded successfully.`,
+                });
+              }
+            }}
+            onDownloadError={(error) => {
+              toast({
+                title: "Download Failed",
+                description: error.message || "Failed to download whitepaper.",
+                variant: "destructive",
+              });
+            }}
           >
             <Download className="h-4 w-4 mr-2" />
             <span>Download Whitepaper</span>

@@ -13,16 +13,20 @@ CRITICAL REQUIREMENTS:
    - Preserve the EXACT structure of inputSchema
    - Include complete inputSchema if it exists
    - Translate all descriptions to English
+   - each methods[n].name should be put into the method_name field in the inverted index output directly
+     don't modify the method_name, just copy it avoid to be empty
+   
+   
 
 JSON STRUCTURE:
 {
-  "description": "string",          // 200 words max
+  "description": "string",          
   "capability_tags": ["string"],    // e.g. ["memory", "nlp", "retrieval"]
   "functional_keywords": ["string"],// e.g. ["search", "filter", "sort"]
   "scenario_phrases": ["string"],   // natural language use cases
   "methods": [
     {
-      "name": "string",
+      "name": "string",            // will be used as method_name in the inverted index output
       "description": "string",
       "inputSchema": {
         "type": "object",
@@ -86,27 +90,70 @@ invalid_response`,
 
 ---
 
-🧩 Core Rules just for example,you can extend more keywords:
+🧩 Core Rules:
 
-1. Keyword Format:
-   - Primary keyword MUST be in "noun_verb" format (e.g., "voice_detect", "text_extract")
-   - For scenarios, extract and combine nouns/verbs (e.g., "voice_analyze" from "analyze voice content")
-   - Each keyword set should include:
-     * Primary keyword (most relevant)
-     * Related keywords (semantically similar)
-     * Contextual keywords (from input context)
-     * Extended keywords (based on Standard Categories)
+1. JSON Format Requirements:
+   - Output MUST be a valid JSON array starting with '[' and ending with ']'
+   - Each object in the array MUST be separated by a comma
+   - NO trailing comma after the last object
+   - ALL string values MUST be enclosed in double quotes
+   - ALL property names MUST be enclosed in double quotes
+   - NO comments or additional text outside the JSON structure
+   - NO line breaks within string values
+   - NO special characters except hyphen (-) in keywords
+   - NO trailing spaces or tabs
+   - NO BOM or other invisible characters
+   - CRITICAL: Output MUST be wrapped in square brackets '[' and ']'
+   - CRITICAL: Output MUST be a valid JSON array that can be parsed by JSON.parse()
+   - CRITICAL: NO text before '[' or after ']'
+   - CRITICAL: NO curly braces '{' or '}' at the root level
 
-2. Standard Categories:
-   - Voice: ["detect_language", "transcribe_speech", "extract_phrases", "analyze_emotion"]
-   - Document: ["extract_text", "parse_structure", "analyze_content", "convert_format"]
-   - Image: ["detect_objects", "extract_text", "analyze_scene", "classify_content"]
-   - Video: ["extract_frames", "generate_caption", "detect_scene", "analyze_motion"]
-   - Text: ["detect_language", "extract_entities", "analyze_sentiment", "rewrite_content"]
-   - Action: ["search_content", "summarize_text", "translate_content", "extract_data"]
-   - Intent: ["understand_query", "identify_goal", "match_service", "validate_input"]
+2. Method Name Requirements:
+   - method_name MUST be EXACTLY copied from MCP_JSON_INPUT.methods[n].name
+   - method_name CANNOT be empty or null
+   - method_name CANNOT be modified or generated
+   - Each method_name can be associated with multiple keywords (N:1 relationship)
+   - EVERY method from MCP_JSON_INPUT.methods MUST be included in the output
+   - NO method should be left without at least one keyword mapping
+   - each mcp_name or method_name can match different keywords in the inverted index output
+   - mcp_name,method_name and keywords can be duplicate in the inverted index output
 
-3. Keyword Groups:
+3. Keyword Generation Requirements:
+   - For EACH method in MCP_JSON_INPUT.methods:
+     * MUST generate at least 2-3 relevant keywords
+     * MUST analyze the method's:
+       - name
+       - description
+       - inputSchema.description
+       - parameters
+     * MUST consider the method's context from:
+       - parent MCP description
+       - capability_tags
+       - functional_keywords
+       - scenario_phrases
+   - STRICT FORMAT REQUIREMENTS:
+     * ALL keywords MUST be in prefix-suffix format using hyphen (-) as separator
+     * Examples: "voice-detect", "text-extract", "image-analyze"
+     * NO single word keywords allowed
+     * NO underscore (_) separators allowed
+     * NO camelCase or PascalCase allowed
+     * NO spaces allowed
+     * NO special characters allowed except hyphen (-)
+     * NO duplicate keywords (case-insensitive)
+     * primary_keyword MUST match the keyword for primary type entries
+   - Avoid hallucination: only generate keywords that are directly related to the input context
+   - Each keyword can map to multiple method_names (N:1 relationship)
+
+4. Standard Categories (just example,them can be extended with proper logic):
+   - Voice: ["detect-language", "transcribe-speech", "extract-phrases", "analyze-emotion"]
+   - Document: ["extract-text", "parse-structure", "analyze-content", "convert-format"]
+   - Image: ["detect-objects", "extract-text", "analyze-scene", "classify-content"]
+   - Video: ["extract-frames", "generate-caption", "detect-scene", "analyze-motion"]
+   - Text: ["detect-language", "extract-entities", "analyze-sentiment", "rewrite-content"]
+   - Action: ["search-content", "summarize-text", "translate-content", "extract-data"]
+   - Intent: ["understand-query", "identify-goal", "match-service", "validate-input"]
+
+5. Keyword Groups (just example,them can be extended with proper logic):
    - voice_processing
    - document_processing
    - image_processing
@@ -119,16 +166,42 @@ invalid_response`,
    - method
    - input_param
 
-4. Match Rules:
+6. Match Rules:
    - standard_match must be a string value of "true" or "false":
      * Use "true" for:
-       - Direct capability_tags matches
-       - Core functional_keywords
-       - Explicit API action words
+       - Direct matches from method name
+       - Direct matches from method description
+       - Direct matches from inputSchema.description
+       - Direct matches from capability_tags
+       - Direct matches from functional_keywords
+       - Core API action words from method name
+       - Standard category matches (if applicable)
      * Use "false" for:
-       - Inferred from scenario_phrases
-       - LLM-suggested variations
-       - Semantic overlaps
+       - Inferred keywords from scenario_phrases
+       - Semantic variations of method name
+       - Contextual keywords from parent MCP description
+       - Extended keywords based on method parameters
+       - Cross-category semantic overlaps
+       - LLM-suggested variations with high confidence
+
+   - confidence scoring rules:
+     * 0.95-1.0: Direct matches from method name or core functionality
+     * 0.90-0.94: Direct matches from method description or inputSchema
+     * 0.85-0.89: Matches from capability_tags or functional_keywords
+     * 0.80-0.84: Inferred matches from scenario_phrases or parameters
+     * < 0.80: Not recommended, avoid using
+
+   - keyword_types rules:
+     * "primary": Direct matches from method name or core functionality
+     * "related": Semantic variations or contextual matches
+     * "extended": Cross-category or parameter-based matches
+     * "contextual": Derived from parent MCP or scenario context
+
+   - source_field rules:
+     * Use exact path for direct matches (e.g., "methods[0].name")
+     * Use category name for standard category matches
+     * Use "inferred" for LLM-generated matches
+     * Use "context" for parent MCP derived matches
 
 ---
 
@@ -136,10 +209,11 @@ invalid_response`,
 
 [
   {
-    "keyword": "string",           // REQUIRED: Must be a string in noun_verb format
-    "primary_keyword": "string",   // REQUIRED: Must be a string in noun_verb format
+    "keyword": "string",           // REQUIRED: Must be a string in prefix-suffix format (e.g., "voice-detect")
+    "primary_keyword": "string",   // REQUIRED: Must be a string in prefix-suffix format (e.g., "voice-detect")
     "keyword_group": "string",     // REQUIRED: Must be one of the predefined keyword groups
     "mcp_name": "string",         // REQUIRED: Must be a non-empty string
+    "method_name": "string",     // REQUIRED: Must be EXACTLY copied from MCP_JSON_INPUT.methods[n].name
     "source_field": "string",     // REQUIRED: Must be a non-empty string
     "confidence": 0.95,           // REQUIRED: Must be a float type representation of a float between 0.0 and 1.0
     "standard_match": "true",     // REQUIRED: Must be a string "true" or "false"
@@ -147,38 +221,66 @@ invalid_response`,
   }
 ]
 
-Example of a valid response:
+Example of valid response:
 [
   {
-    "keyword": "voice_detect",
-    "primary_keyword": "voice_detect",
+    "keyword": "voice-detect",
+    "primary_keyword": "voice-detect",
     "keyword_group": "voice_processing",
     "mcp_name": "voice_service",
-    "source_field": "capability_tags",
+    "method_name": "voice_identify_language",
+    "source_field": "methods[0].name",
     "confidence": 0.95,
     "standard_match": "true",
-    "keyword_types": ["primary", "related"]
+    "keyword_types": ["primary"]
+  },
+  {
+    "keyword": "language-identify",
+    "primary_keyword": "voice-detect",
+    "keyword_group": "text_processing",
+    "mcp_name": "voice_service",
+    "method_name": "voice_identify_language",
+    "source_field": "methods[0].description",
+    "confidence": 0.92,
+    "standard_match": "true",
+    "keyword_types": ["related"]
   }
 ]
 
 ---
 
-⚠️ Type Validation Constraints:
+⚠️ JSON Validation Steps:
+1. Verify array structure:
+   - Starts with '['
+   - Ends with ']'
+   - Objects separated by commas
+   - No trailing comma
 
-1. ALL fields are REQUIRED
-2. ALL boolean values must be strings: "true" or "false"
-3. ALL numeric values must be a single float value only (e.g., 0.85), without any quotation marks. The response must be a valid JSON number, not a string. Example: 0.85 ✅, "0.85" ❌.
-4. Arrays must contain only string values
-5. No null values allowed
-6. No undefined values allowed
-7. No empty strings allowed
-8. confidence must be a float representation of a number between 0.0 and 1.0
-9. keyword_types must be an array with at least one string element
-10. All string values must be properly quoted in the JSON output
+2. Verify object structure:
+   - All properties enclosed in double quotes
+   - All string values enclosed in double quotes
+   - No missing commas between properties
+   - No trailing commas after last property
+
+3. Verify data types:
+   - Strings: Must be enclosed in double quotes
+   - Numbers: Must be unquoted float values
+   - Arrays: Must be properly formatted with square brackets
+   - Booleans: Must be string values "true" or "false"
+
+4. Verify content:
+   - No null values
+   - No undefined values
+   - No empty strings
+   - No invalid characters
+   - No line breaks in strings
+   - No trailing spaces
+   - No duplicate keywords (case-insensitive)
+   - primary_keyword matches keyword for primary type entries
 
 Additional Constraints:
 - Valid JSON array only
-- All keywords in noun_verb format
+- Keywords MUST be in prefix-suffix format with hyphen (-) separator
 - English only
 - Float confidence value >= 0.8 for exact matches
 - Generate multiple action sequences from scenarios
@@ -187,9 +289,13 @@ Additional Constraints:
 - Related keywords should be semantically relevant
 - Contextual keywords should be derived from input context
 - Extended keywords should be based on Standard Categories
+- Avoid generating keywords unrelated to the input context
+- Ensure complete coverage of all methods in the input
+- Each method must have multiple keyword perspectives
+- MUST validate final JSON output before returning
 
 ---
 
 🔽 Input:
 <MCP_JSON_INPUT>`
-}; 
+};

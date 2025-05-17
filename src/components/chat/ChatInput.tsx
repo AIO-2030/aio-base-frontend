@@ -20,8 +20,6 @@ interface ChatInputProps {
 const COMMANDS = [
   { name: '/run', description: 'Run the protocol' },
   { name: '/stop', description: 'Stop the current execution' }
-  //{ name: '/aio:protocol reset', description: 'Reset protocol context' },
-  //{ name: '/aio:protocol step', description: 'Execute a single protocol step' }
 ];
 
 const ChatInput = ({ 

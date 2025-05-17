@@ -425,6 +425,7 @@ export const extractJsonResponseToList = (jsonStr: string | object): string => {
           result += `${prefix}${key}:${value}\n`;
         }
       }
+      result += `-----------------------------------\n`;
       
       return result;
     };
@@ -432,7 +433,7 @@ export const extractJsonResponseToList = (jsonStr: string | object): string => {
     return processObject(jsonObj).trim();
   } catch (error) {
     console.error('[Response List] Error converting JSON to list:', error);
-    return 'Error: Invalid JSON format';
+    return jsonStr.toString();
   }
 };
 
@@ -465,6 +466,7 @@ export const extractJsonResponseToValueString = (jsonStr: string | object): stri
           // For primitive values, add key-value pair
           pairs.push(`${currentKey}:${value}`);
         }
+        pairs.push(`${currentKey}:${value}`);
       }
       
       return pairs;
@@ -474,6 +476,6 @@ export const extractJsonResponseToValueString = (jsonStr: string | object): stri
     return `Now I need you help me do further steps with these informations,please check  and give me intent analyse result:\n${pairs.join('\n')}`;
   } catch (error) {
     console.error('[Response Value String] Error converting JSON to value string:', error);
-    return 'Error: Invalid JSON format';
+    return jsonStr.toString();
   }
 };

@@ -127,7 +127,63 @@ export const submitMCPServer = async (
 export const storeMcpInvertIndex = async (mcpName: string, jsonStr: string): Promise<{Ok: null} | {Err: string}> => {
   console.log('Storing MCP inverted index:', jsonStr);
   try {
-    const result = await storeInvertedIndex(mcpName, jsonStr);
+    // Add JSON repair logic
+    let fixedJsonData = jsonStr.trim();
+    
+    // 1. First try to parse the original data to check if it's a valid JSON array
+    let isOriginalValidArray = false;
+    try {
+      const parsedOriginal = JSON.parse(fixedJsonData);
+      isOriginalValidArray = Array.isArray(parsedOriginal);
+    } catch (e) {
+      // Original data is not valid JSON, we'll try to fix it
+    }
+
+    // 2. If original data is a valid array but missing brackets, add them
+    if (isOriginalValidArray) {
+      if (!fixedJsonData.startsWith('[')) {
+        fixedJsonData = '[' + fixedJsonData;
+      }
+      if (!fixedJsonData.endsWith(']')) {
+        fixedJsonData = fixedJsonData + ']';
+      }
+    } else {
+      // 3. If not a valid array, try to fix common issues
+      // Remove any text before first valid JSON character and after last valid JSON character
+      const firstValidChar = fixedJsonData.search(/[{[]/);
+      const lastValidChar = fixedJsonData.search(/[}\]]/);
+      
+      if (firstValidChar === -1 || lastValidChar === -1) {
+        throw new Error('Invalid JSON format: No valid JSON structure found');
+      }
+      
+      fixedJsonData = fixedJsonData.slice(firstValidChar, lastValidChar + 1);
+      
+      // If data is wrapped in curly braces, convert to array
+      if (fixedJsonData.startsWith('{') && fixedJsonData.endsWith('}')) {
+        fixedJsonData = '[' + fixedJsonData + ']';
+      }
+      
+      // Remove trailing commas
+      fixedJsonData = fixedJsonData.replace(/,(\s*[\]}])/g, '$1');
+      
+      // Fix missing commas between objects
+      fixedJsonData = fixedJsonData.replace(/}\s*{/g, '},{');
+    }
+
+    // 4. Final validation
+    try {
+      const parsedData = JSON.parse(fixedJsonData);
+      if (!Array.isArray(parsedData)) {
+        throw new Error('Data must be a JSON array');
+      }
+      console.log('[JSON_REPAIR] Successfully validated and fixed JSON array');
+    } catch (parseError) {
+      console.error('[JSON_REPAIR] Failed to validate JSON:', parseError);
+      throw new Error(`Invalid JSON format: ${parseError.message}`);
+    }
+
+    const result = await storeInvertedIndex(mcpName, fixedJsonData);
     console.log('Store MCP inverted index result:', result);
     return result;
   } catch (error) {

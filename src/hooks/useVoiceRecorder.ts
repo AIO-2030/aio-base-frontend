@@ -10,9 +10,12 @@ import {
   fixMalformedJson, 
   safeJsonParse,
   extractJsonFromMarkdownSections,
-  extractResponseFromRawJson,
-  
+  extractResponseFromRawJson
 } from '@/util/formatters';
+import { 
+  extractJsonResponseToList,
+  extractJsonResponseToValueString 
+} from '@/util/json/responseFormatter';
 import { useChat } from '@/contexts/ChatContext';
 import { AttachedFile } from '@/components/chat/ChatFileUploader';
 
@@ -560,10 +563,10 @@ export const useVoiceRecorder = () => {
       const protocolHandler = AIOProtocolHandler.getInstance();
       const contextId = `voice-protocol-${Date.now()}`;
       
-      const context =await protocolHandler.init_calling_context(
+      const context = await protocolHandler.init_stable_context(
         contextId,
-        voiceData.voiceData, // Pass raw voice data, let protocol handler adapt it
-        operationKeywords,
+        voiceData.voiceData,
+        operationKeywords.join(','),
         aiMessage.execution_plan
       );
 
@@ -576,34 +579,59 @@ export const useVoiceRecorder = () => {
         });
         return null;
       }
+
       console.log("[useVoiceRecorder] Will execute protocol step by step with context:", context);
       addDirectMessage(`Starting voice protocol execution (ID: ${contextId})`);
-      // Start protocol execution
-      const protocolMessage = await protocolHandler.calling_step_by_step(
-        contextId,
-        "",
-        true,
-        addDirectMessage
-      );
-      // call LLM to get intent analysis result
-      if (protocolMessage.protocolContext?.metadata?.intentLLMInput) {
-        console.log("[useVoiceRecorder] LLM intent analysis input:", protocolMessage.protocolContext.metadata.intentLLMInput);
-        let intentResult = await sendMessage(protocolMessage.protocolContext.metadata.intentLLMInput, new Array<AttachedFile>() );
-        console.log("[useVoiceRecorder] LLM intent analysis result:", intentResult);
-        protocolMessage.content = intentResult.content;
+
+      // 执行每个步骤
+      let finalResult = null;
+      for (let i = 0; i < operationKeywords.length; i++) {
+        const stepResult = await protocolHandler.calling_next(contextId, "", addDirectMessage);
+        if (!stepResult.success) {
+          throw new Error(stepResult.message);
+        }
+        
+        // 更新步骤结果
+        const updatedContext = await protocolHandler.calling_step_by_step(contextId, "" ,addDirectMessage);
+        if (!updatedContext) {
+          throw new Error("Failed to update step result");
+        }
+        finalResult = stepResult.data;
       }
 
-      if (!protocolMessage) {
-        console.error("[useVoiceRecorder] Failed to start protocol execution");
-        protocolHandler.deleteContext(contextId);
-        return null;
+      // 创建最终消息
+      const finalMessage: AIMessage = {
+        id: `aio-protocol-result-${Date.now()}`,
+        sender: 'ai',
+        content: typeof finalResult === 'string' ? finalResult : extractJsonResponseToList(finalResult.output),
+        timestamp: new Date(),
+        protocolContext: {
+          contextId,
+          currentStep: operationKeywords.length,
+          totalSteps: operationKeywords.length,
+          isComplete: true,
+          status: 'completed',
+          metadata: {
+            operation: context.opr_keywd[context.curr_call_index - 1] || '',
+            mcp: context.step_mcps?.[context.curr_call_index - 1] || '',
+            intentLLMInput: extractJsonResponseToValueString(finalResult.output)
+          }
+        }
+      };
+
+      // 调用 LLM 获取意图分析结果
+      if (finalMessage.protocolContext?.metadata?.intentLLMInput) {
+        console.log("[useVoiceRecorder] LLM intent analysis input:", finalMessage.protocolContext.metadata.intentLLMInput);
+        let intentResult = await sendMessage(finalMessage.protocolContext.metadata.intentLLMInput, new Array<AttachedFile>());
+        console.log("[useVoiceRecorder] LLM intent analysis result:", intentResult);
+        finalMessage.content = intentResult.content;
       }
 
       console.log("[useVoiceRecorder] Protocol started successfully:", contextId);
-      handleVoiceIntentResponse(protocolMessage);
+      handleVoiceIntentResponse(finalMessage);
       return {
         contextId,
-        message: protocolMessage
+        message: finalMessage
       };
     } catch (error) {
       console.error("[useVoiceRecorder] Error starting protocol:", error);
