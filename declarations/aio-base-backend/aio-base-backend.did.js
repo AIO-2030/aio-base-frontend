@@ -33,6 +33,41 @@ export const idlFactory = ({ IDL }) => {
     'version' : IDL.Text,
     'output_example' : IDL.Opt(IDL.Text),
   });
+  const DeviceStatus = IDL.Variant({
+    'Online' : IDL.Null,
+    'Disabled' : IDL.Null,
+    'Maintenance' : IDL.Null,
+    'Offline' : IDL.Null,
+  });
+  const DeviceCapability = IDL.Variant({
+    'Storage' : IDL.Null,
+    'Network' : IDL.Null,
+    'Compute' : IDL.Null,
+    'Custom' : IDL.Text,
+    'Sensor' : IDL.Null,
+    'Audio' : IDL.Null,
+    'Video' : IDL.Null,
+  });
+  const DeviceType = IDL.Variant({
+    'IoT' : IDL.Null,
+    'Server' : IDL.Null,
+    'Embedded' : IDL.Null,
+    'Other' : IDL.Text,
+    'Desktop' : IDL.Null,
+    'Mobile' : IDL.Null,
+  });
+  const DeviceInfo = IDL.Record({
+    'id' : IDL.Text,
+    'status' : DeviceStatus,
+    'updated_at' : IDL.Nat64,
+    'capabilities' : IDL.Vec(DeviceCapability),
+    'owner' : IDL.Principal,
+    'metadata' : IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text)),
+    'name' : IDL.Text,
+    'device_type' : DeviceType,
+    'created_at' : IDL.Nat64,
+    'last_seen' : IDL.Nat64,
+  });
   const McpItem = IDL.Record({
     'id' : IDL.Nat64,
     'tools' : IDL.Bool,
@@ -54,6 +89,30 @@ export const idlFactory = ({ IDL }) => {
     'subaccount_id' : IDL.Opt(IDL.Text),
     'principal_id' : IDL.Text,
   });
+  const LoginStatus = IDL.Variant({
+    'Authenticated' : IDL.Null,
+    'Unauthenticated' : IDL.Null,
+  });
+  const LoginMethod = IDL.Variant({
+    'II' : IDL.Null,
+    'Google' : IDL.Null,
+    'Wallet' : IDL.Null,
+  });
+  const UserProfile = IDL.Record({
+    'updated_at' : IDL.Nat64,
+    'nickname' : IDL.Text,
+    'metadata' : IDL.Opt(IDL.Text),
+    'name' : IDL.Opt(IDL.Text),
+    'wallet_address' : IDL.Opt(IDL.Text),
+    'created_at' : IDL.Nat64,
+    'user_id' : IDL.Text,
+    'email' : IDL.Opt(IDL.Text),
+    'picture' : IDL.Opt(IDL.Text),
+    'login_status' : LoginStatus,
+    'login_method' : LoginMethod,
+    'principal_id' : IDL.Text,
+    'devices' : IDL.Vec(IDL.Text),
+  });
   const TokenGrantStatus = IDL.Variant({
     'Active' : IDL.Null,
     'Cancelled' : IDL.Null,
@@ -68,6 +127,38 @@ export const idlFactory = ({ IDL }) => {
     'start_time' : IDL.Nat64,
     'amount' : IDL.Nat64,
   });
+  const CreateOrderArgs = IDL.Record({
+    'sku' : IDL.Text,
+    'redirect_base' : IDL.Text,
+    'shipping_address' : IDL.Text,
+    'buyer_email' : IDL.Opt(IDL.Text),
+    'currency' : IDL.Text,
+    'order_id' : IDL.Text,
+    'amount' : IDL.Float64,
+  });
+  const InvoiceResp = IDL.Record({
+    'invoice_id' : IDL.Text,
+    'invoice_url' : IDL.Text,
+  });
+  const SourceMeta = IDL.Record({
+    'title' : IDL.Opt(IDL.Text),
+    'tags' : IDL.Opt(IDL.Vec(IDL.Text)),
+    'description' : IDL.Opt(IDL.Text),
+  });
+  const PixelRow = IDL.Vec(IDL.Nat16);
+  const Frame = IDL.Record({
+    'pixels' : IDL.Vec(PixelRow),
+    'duration_ms' : IDL.Nat32,
+  });
+  const PixelArtSource = IDL.Record({
+    'height' : IDL.Nat32,
+    'metadata' : IDL.Opt(SourceMeta),
+    'palette' : IDL.Vec(IDL.Text),
+    'pixels' : IDL.Vec(PixelRow),
+    'frames' : IDL.Opt(IDL.Vec(Frame)),
+    'width' : IDL.Nat32,
+  });
+  const ProjectId = IDL.Text;
   const TokenGrant = IDL.Record({
     'status' : TokenGrantStatus,
     'claimed_amount' : IDL.Nat64,
@@ -75,6 +166,7 @@ export const idlFactory = ({ IDL }) => {
     'start_time' : IDL.Nat64,
     'amount' : IDL.Nat64,
   });
+  const VersionId = IDL.Text;
   SchemaProperty.fill(
     IDL.Record({
       'description' : IDL.Opt(IDL.Text),
@@ -114,6 +206,12 @@ export const idlFactory = ({ IDL }) => {
     'keywords' : IDL.Vec(IDL.Text),
     'github' : IDL.Text,
   });
+  const DeviceListResponse = IDL.Record({
+    'total' : IDL.Nat64,
+    'offset' : IDL.Nat64,
+    'limit' : IDL.Nat64,
+    'devices' : IDL.Vec(DeviceInfo),
+  });
   const IOValue = IDL.Record({
     'value' : IDL.Variant({
       'Null' : IDL.Null,
@@ -140,6 +238,47 @@ export const idlFactory = ({ IDL }) => {
     'context_id' : IDL.Text,
     'calls' : IDL.Vec(ProtocolCall),
     'trace_id' : IDL.Text,
+  });
+  const MessageMode = IDL.Variant({
+    'Gif' : IDL.Null,
+    'Emoji' : IDL.Null,
+    'Text' : IDL.Null,
+    'Image' : IDL.Null,
+    'PixelArt' : IDL.Null,
+    'Voice' : IDL.Null,
+  });
+  const ChatMessage = IDL.Record({
+    'content' : IDL.Text,
+    'mode' : MessageMode,
+    'timestamp' : IDL.Nat64,
+    'send_by' : IDL.Text,
+  });
+  const ContactStatus = IDL.Variant({
+    'Blocked' : IDL.Null,
+    'Active' : IDL.Null,
+    'Deleted' : IDL.Null,
+    'Pending' : IDL.Null,
+  });
+  const ContactType = IDL.Variant({
+    'Family' : IDL.Null,
+    'System' : IDL.Null,
+    'Business' : IDL.Null,
+    'Friend' : IDL.Null,
+  });
+  const Contact = IDL.Record({
+    'id' : IDL.Nat64,
+    'status' : ContactStatus,
+    'updated_at' : IDL.Nat64,
+    'nickname' : IDL.Opt(IDL.Text),
+    'metadata' : IDL.Opt(IDL.Text),
+    'name' : IDL.Text,
+    'created_at' : IDL.Nat64,
+    'owner_principal_id' : IDL.Text,
+    'is_online' : IDL.Bool,
+    'contact_type' : ContactType,
+    'devices' : IDL.Vec(IDL.Text),
+    'contact_principal_id' : IDL.Text,
+    'avatar' : IDL.Opt(IDL.Text),
   });
   const TransferStatus = IDL.Variant({
     'Failed' : IDL.Null,
@@ -193,6 +332,51 @@ export const idlFactory = ({ IDL }) => {
     'stack_amount' : IDL.Nat64,
     'stack_status' : StackStatus,
     'principal_id' : IDL.Text,
+  });
+  const NotificationItem = IDL.Record({
+    'social_pair_key' : IDL.Text,
+    'to_who' : IDL.Text,
+    'timestamp' : IDL.Nat64,
+    'message_id' : IDL.Nat64,
+  });
+  const OrderStatus = IDL.Variant({
+    'New' : IDL.Null,
+    'Invalid' : IDL.Null,
+    'Paid' : IDL.Null,
+    'Delivered' : IDL.Null,
+    'Complete' : IDL.Null,
+    'Confirmed' : IDL.Null,
+    'Created' : IDL.Null,
+    'Expired' : IDL.Null,
+  });
+  const Order = IDL.Record({
+    'sku' : IDL.Text,
+    'status' : OrderStatus,
+    'shipment_no' : IDL.Opt(IDL.Text),
+    'shipping_address' : IDL.Text,
+    'updated_at_ns' : IDL.Nat64,
+    'buyer_email' : IDL.Opt(IDL.Text),
+    'created_at_ns' : IDL.Nat64,
+    'currency' : IDL.Text,
+    'order_id' : IDL.Text,
+    'amount' : IDL.Float64,
+    'bitpay_invoice_url' : IDL.Opt(IDL.Text),
+    'bitpay_invoice_id' : IDL.Opt(IDL.Text),
+  });
+  const Version = IDL.Record({
+    'version_id' : VersionId,
+    'source' : PixelArtSource,
+    'editor' : IDL.Principal,
+    'created_at' : IDL.Nat64,
+    'message' : IDL.Opt(IDL.Text),
+  });
+  const Project = IDL.Record({
+    'updated_at' : IDL.Nat64,
+    'owner' : IDL.Principal,
+    'history' : IDL.Vec(Version),
+    'created_at' : IDL.Nat64,
+    'current_version' : Version,
+    'project_id' : ProjectId,
   });
   const RechargeRecord = IDL.Record({
     'user' : IDL.Principal,
@@ -260,6 +444,12 @@ export const idlFactory = ({ IDL }) => {
     'grant_amount' : IDL.Nat64,
     'grant_action' : GrantAction,
   });
+  const DeviceFilter = IDL.Record({
+    'status' : IDL.Opt(DeviceStatus),
+    'owner' : IDL.Opt(IDL.Principal),
+    'device_type' : IDL.Opt(DeviceType),
+    'capability' : IDL.Opt(DeviceCapability),
+  });
   return IDL.Service({
     'add_account' : IDL.Func(
         [IDL.Text],
@@ -268,6 +458,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'add_agent_item' : IDL.Func(
         [AgentItem, IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
+        [],
+      ),
+    'add_device' : IDL.Func(
+        [DeviceInfo],
         [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
         [],
       ),
@@ -286,6 +481,12 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : AccountInfo, 'Err' : IDL.Text })],
         [],
       ),
+    'add_user_device' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Variant({ 'Ok' : UserProfile, 'Err' : IDL.Text })],
+        [],
+      ),
+    'admin_set_bitpay_pos_token' : IDL.Func([IDL.Text], [], []),
     'cal_unclaim_rewards' : IDL.Func([IDL.Text], [IDL.Nat64], ['query']),
     'calculate_emission' : IDL.Func(
         [IDL.Text],
@@ -305,6 +506,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'claim_rewards' : IDL.Func(
         [IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
+        [],
+      ),
+    'clear_notifications_for_pair' : IDL.Func(
+        [IDL.Text, IDL.Text],
         [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
         [],
       ),
@@ -328,9 +534,24 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
         [],
       ),
+    'create_contact_from_principal_id' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
+        [],
+      ),
     'create_mcp_grant' : IDL.Func(
         [NewMcpGrant],
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
+        [],
+      ),
+    'create_order_and_invoice' : IDL.Func(
+        [CreateOrderArgs],
+        [IDL.Variant({ 'Ok' : InvoiceResp, 'Err' : IDL.Text })],
+        [],
+      ),
+    'create_pixel_project' : IDL.Func(
+        [IDL.Text, PixelArtSource, IDL.Opt(IDL.Text)],
+        [IDL.Variant({ 'Ok' : ProjectId, 'Err' : IDL.Text })],
         [],
       ),
     'create_token_grant' : IDL.Func(
@@ -348,6 +569,16 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
         [],
       ),
+    'delete_contact' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Bool, 'Err' : IDL.Text })],
+        [],
+      ),
+    'delete_device' : IDL.Func(
+        [IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
+        [],
+      ),
     'delete_inverted_index_by_mcp' : IDL.Func(
         [IDL.Text],
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
@@ -358,9 +589,19 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
         [],
       ),
+    'delete_pixel_project' : IDL.Func(
+        [IDL.Text, ProjectId],
+        [IDL.Variant({ 'Ok' : IDL.Bool, 'Err' : IDL.Text })],
+        [],
+      ),
     'delete_recharge_principal_account_api' : IDL.Func(
         [],
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
+        [],
+      ),
+    'delete_user_profile' : IDL.Func(
+        [IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Bool, 'Err' : IDL.Text })],
         [],
       ),
     'dispatch_mining_rewards' : IDL.Func(
@@ -370,6 +611,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'export_aio_index_to_json' : IDL.Func(
         [IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text })],
+        ['query'],
+      ),
+    'export_pixel_for_device' : IDL.Func(
+        [ProjectId, IDL.Opt(VersionId)],
         [IDL.Variant({ 'Ok' : IDL.Text, 'Err' : IDL.Text })],
         ['query'],
       ),
@@ -394,6 +640,11 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'find_inverted_index_by_mcp' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
+    'generate_social_pair_key' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Text],
+        ['query'],
+      ),
     'get_account_info' : IDL.Func([IDL.Text], [IDL.Opt(AccountInfo)], []),
     'get_accounts_paginated' : IDL.Func(
         [IDL.Nat64, IDL.Nat64],
@@ -421,6 +672,11 @@ export const idlFactory = ({ IDL }) => {
     'get_all_accounts' : IDL.Func([], [IDL.Vec(AccountInfo)], ['query']),
     'get_all_agent_items' : IDL.Func([], [IDL.Vec(AgentItem)], ['query']),
     'get_all_aio_indices' : IDL.Func([], [IDL.Vec(AioIndex)], ['query']),
+    'get_all_devices' : IDL.Func(
+        [IDL.Nat64, IDL.Nat64],
+        [DeviceListResponse],
+        ['query'],
+      ),
     'get_all_inverted_index_items' : IDL.Func([], [IDL.Text], ['query']),
     'get_all_keywords' : IDL.Func([], [IDL.Text], ['query']),
     'get_all_mcp_grants' : IDL.Func([], [IDL.Vec(NewMcpGrant)], ['query']),
@@ -438,6 +694,32 @@ export const idlFactory = ({ IDL }) => {
             'total_count' : IDL.Nat64,
           }),
         ],
+        ['query'],
+      ),
+    'get_chat_message_count' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Nat64],
+        ['query'],
+      ),
+    'get_chat_messages_paginated' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Nat64, IDL.Nat64],
+        [IDL.Vec(ChatMessage)],
+        ['query'],
+      ),
+    'get_contact_by_id' : IDL.Func([IDL.Nat64], [IDL.Opt(Contact)], ['query']),
+    'get_contact_by_principal_ids' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Opt(Contact)],
+        ['query'],
+      ),
+    'get_contacts_by_owner' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(Contact)],
+        ['query'],
+      ),
+    'get_contacts_by_owner_paginated' : IDL.Func(
+        [IDL.Text, IDL.Nat64, IDL.Nat64],
+        [IDL.Vec(Contact)],
         ['query'],
       ),
     'get_credit_activities' : IDL.Func(
@@ -472,6 +754,12 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'get_credits_per_icp_api' : IDL.Func([], [IDL.Nat64], ['query']),
+    'get_device_by_id' : IDL.Func([IDL.Text], [IDL.Opt(DeviceInfo)], ['query']),
+    'get_devices_by_owner' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(DeviceInfo)],
+        ['query'],
+      ),
     'get_emission_policy' : IDL.Func(
         [],
         [IDL.Variant({ 'Ok' : EmissionPolicy, 'Err' : IDL.Text })],
@@ -528,6 +816,38 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Text, IDL.Nat64, IDL.Nat64],
         [IDL.Vec(McpStackRecord)],
         [],
+      ),
+    'get_notifications_for_receiver' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(NotificationItem)],
+        ['query'],
+      ),
+    'get_order_by_id' : IDL.Func([IDL.Text], [IDL.Opt(Order)], ['query']),
+    'get_pixel_current_source' : IDL.Func(
+        [ProjectId],
+        [IDL.Opt(PixelArtSource)],
+        ['query'],
+      ),
+    'get_pixel_project' : IDL.Func([ProjectId], [IDL.Opt(Project)], ['query']),
+    'get_pixel_project_count_by_owner' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Nat64],
+        ['query'],
+      ),
+    'get_pixel_projects_paginated' : IDL.Func(
+        [IDL.Nat64, IDL.Nat64],
+        [IDL.Vec(Project)],
+        ['query'],
+      ),
+    'get_pixel_version' : IDL.Func(
+        [ProjectId, VersionId],
+        [IDL.Opt(Version)],
+        ['query'],
+      ),
+    'get_recent_chat_messages' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Vec(ChatMessage)],
+        ['query'],
       ),
     'get_recharge_history_api' : IDL.Func(
         [IDL.Text, IDL.Nat64, IDL.Nat64],
@@ -593,7 +913,14 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'get_total_aiotoken_claimable' : IDL.Func([], [IDL.Nat64], ['query']),
+    'get_total_contacts_by_owner' : IDL.Func(
+        [IDL.Text],
+        [IDL.Nat64],
+        ['query'],
+      ),
+    'get_total_pixel_project_count' : IDL.Func([], [IDL.Nat64], ['query']),
     'get_total_stacked_credits' : IDL.Func([], [IDL.Nat64], ['query']),
+    'get_total_user_profiles' : IDL.Func([], [IDL.Nat64], ['query']),
     'get_trace' : IDL.Func([IDL.Text], [IDL.Opt(TraceLog)], ['query']),
     'get_trace_by_context' : IDL.Func(
         [IDL.Text],
@@ -713,6 +1040,26 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(McpItem)],
         ['query'],
       ),
+    'get_user_profile_by_email' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
+    'get_user_profile_by_principal' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
+    'get_user_profile_by_user_id' : IDL.Func(
+        [IDL.Text],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
+    'get_user_profiles_paginated' : IDL.Func(
+        [IDL.Nat64, IDL.Nat64],
+        [IDL.Vec(UserProfile)],
+        ['query'],
+      ),
     'grant_token' : IDL.Func(
         [TokenGrant],
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
@@ -721,6 +1068,11 @@ export const idlFactory = ({ IDL }) => {
     'greet' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
     'init_emission_policy' : IDL.Func([], [], []),
     'init_grant_policy' : IDL.Func([IDL.Opt(GrantPolicy)], [], []),
+    'list_pixel_projects_by_owner' : IDL.Func(
+        [IDL.Principal, IDL.Nat32, IDL.Nat32],
+        [IDL.Vec(Project)],
+        ['query'],
+      ),
     'list_recharge_principal_accounts_api' : IDL.Func(
         [],
         [IDL.Vec(RechargePrincipalAccount)],
@@ -736,6 +1088,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : IDL.Vec(RewardEntry), 'Err' : IDL.Text })],
         [],
       ),
+    'pop_notification' : IDL.Func([IDL.Text], [IDL.Opt(NotificationItem)], []),
     'recharge_and_convert_credits_api' : IDL.Func(
         [IDL.Float64],
         [IDL.Nat64],
@@ -757,15 +1110,46 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
         [],
       ),
+    'remove_user_device' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Variant({ 'Ok' : UserProfile, 'Err' : IDL.Text })],
+        [],
+      ),
     'revert_Index_find_by_keywords_strategy' : IDL.Func(
         [IDL.Vec(IDL.Text)],
         [IDL.Text],
         ['query'],
       ),
+    'save_pixel_version' : IDL.Func(
+        [
+          IDL.Text,
+          ProjectId,
+          PixelArtSource,
+          IDL.Opt(IDL.Text),
+          IDL.Opt(IDL.Text),
+        ],
+        [IDL.Variant({ 'Ok' : VersionId, 'Err' : IDL.Text })],
+        [],
+      ),
     'search_aio_indices_by_keyword' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(AioIndex)],
         ['query'],
+      ),
+    'search_contacts_by_name' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Vec(Contact)],
+        ['query'],
+      ),
+    'search_devices' : IDL.Func(
+        [DeviceFilter],
+        [IDL.Vec(DeviceInfo)],
+        ['query'],
+      ),
+    'send_chat_message' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, MessageMode],
+        [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
+        [],
       ),
     'simulate_credit_from_icp_api' : IDL.Func(
         [IDL.Float64],
@@ -812,6 +1196,41 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
         [],
       ),
+    'update_contact_devices' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Vec(IDL.Text)],
+        [IDL.Variant({ 'Ok' : Contact, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_contact_nickname' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text],
+        [IDL.Variant({ 'Ok' : Contact, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_contact_online_status' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Bool],
+        [IDL.Variant({ 'Ok' : Contact, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_contact_status' : IDL.Func(
+        [IDL.Text, IDL.Text, ContactStatus],
+        [IDL.Variant({ 'Ok' : Contact, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_device' : IDL.Func(
+        [IDL.Text, DeviceInfo],
+        [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_device_last_seen' : IDL.Func(
+        [IDL.Text],
+        [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_device_status' : IDL.Func(
+        [IDL.Text, DeviceStatus],
+        [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
+        [],
+      ),
     'update_emission_policy' : IDL.Func(
         [EmissionPolicy],
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
@@ -835,6 +1254,26 @@ export const idlFactory = ({ IDL }) => {
     'update_recharge_principal_account_api' : IDL.Func(
         [RechargePrincipalAccount],
         [IDL.Variant({ 'Ok' : IDL.Null, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_user_devices' : IDL.Func(
+        [IDL.Text, IDL.Vec(IDL.Text)],
+        [IDL.Variant({ 'Ok' : UserProfile, 'Err' : IDL.Text })],
+        [],
+      ),
+    'update_user_nickname' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Variant({ 'Ok' : UserProfile, 'Err' : IDL.Text })],
+        [],
+      ),
+    'upsert_contact' : IDL.Func(
+        [Contact],
+        [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
+        [],
+      ),
+    'upsert_user_profile' : IDL.Func(
+        [UserProfile],
+        [IDL.Variant({ 'Ok' : IDL.Nat64, 'Err' : IDL.Text })],
         [],
       ),
     'use_credit' : IDL.Func(

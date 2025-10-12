@@ -341,6 +341,249 @@ type RechargePrincipalAccount = record {
   subaccount_id: opt text;
 };
 
+type LoginMethod = variant {
+  Wallet;
+  Google;
+  II;
+};
+
+type LoginStatus = variant {
+  Authenticated;
+  Unauthenticated;
+};
+
+type UserProfile = record {
+  user_id: text;
+  principal_id: text;
+  name: opt text;
+  nickname: text;
+  login_method: LoginMethod;
+  login_status: LoginStatus;
+  email: opt text;
+  picture: opt text;
+  wallet_address: opt text;
+  devices: vec text;
+  created_at: nat64;
+  updated_at: nat64;
+  metadata: opt text;
+};
+
+// ==== Contact Types ====
+
+type ContactType = variant {
+  Friend;
+  System;
+  Business;
+  Family;
+};
+
+type ContactStatus = variant {
+  Active;
+  Pending;
+  Blocked;
+  Deleted;
+};
+
+type Contact = record {
+  id: nat64;
+  owner_principal_id: text;
+  contact_principal_id: text;
+  name: text;
+  nickname: opt text;
+  contact_type: ContactType;
+  status: ContactStatus;
+  avatar: opt text;
+  devices: vec text;
+  is_online: bool;
+  created_at: nat64;
+  updated_at: nat64;
+  metadata: opt text;
+};
+
+// ==== Social Chat Types ====
+
+type MessageMode = variant {
+  Text;
+  Voice;
+  Image;
+  Emoji;
+  PixelArt;
+  Gif;
+};
+
+type PixelArtData = record {
+  chat_format: text;
+  device_format: text;
+  width: nat32;
+  height: nat32;
+  palette: vec text;
+  source_type: text;
+  source_id: opt text;
+};
+
+type ChatMessage = record {
+  send_by: text;
+  content: text;
+  mode: MessageMode;
+  timestamp: nat64;
+};
+
+type ChatHistory = record {
+  social_pair_key: text;
+  messages: vec ChatMessage;
+  created_at: nat64;
+  updated_at: nat64;
+};
+
+type NotificationItem = record {
+  social_pair_key: text;
+  to_who: text;
+  message_id: nat64;
+  timestamp: nat64;
+};
+
+// ==== Device Management Types ====
+
+type DeviceType = variant {
+  Mobile;
+  Desktop;
+  Server;
+  IoT;
+  Embedded;
+  Other: text;
+};
+
+type DeviceStatus = variant {
+  Online;
+  Offline;
+  Maintenance;
+  Disabled;
+};
+
+type DeviceCapability = variant {
+  Audio;
+  Video;
+  Storage;
+  Network;
+  Compute;
+  Sensor;
+  Custom: text;
+};
+
+type DeviceInfo = record {
+  id: text;
+  name: text;
+  device_type: DeviceType;
+  owner: principal;
+  status: DeviceStatus;
+  capabilities: vec DeviceCapability;
+  metadata: vec record { text; text };
+  created_at: nat64;
+  updated_at: nat64;
+  last_seen: nat64;
+};
+
+type DeviceFilter = record {
+  owner: opt principal;
+  device_type: opt DeviceType;
+  status: opt DeviceStatus;
+  capability: opt DeviceCapability;
+};
+
+type DeviceListResponse = record {
+  devices: vec DeviceInfo;
+  total: nat64;
+  offset: nat64;
+  limit: nat64;
+};
+
+// ==== Order Management Types ====
+
+type OrderStatus = variant {
+  Created;
+  New;
+  Paid;
+  Confirmed;
+  Complete;
+  Expired;
+  Invalid;
+  Delivered;
+};
+
+type CreateOrderArgs = record {
+  order_id: text;
+  amount: float64;
+  currency: text;
+  buyer_email: opt text;
+  shipping_address: text;
+  sku: text;
+  redirect_base: text;
+};
+
+type Order = record {
+  order_id: text;
+  amount: float64;
+  currency: text;
+  buyer_email: opt text;
+  shipping_address: text;
+  sku: text;
+  bitpay_invoice_id: opt text;
+  bitpay_invoice_url: opt text;
+  status: OrderStatus;
+  shipment_no: opt text;
+  created_at_ns: nat64;
+  updated_at_ns: nat64;
+};
+
+type InvoiceResp = record {
+  invoice_id: text;
+  invoice_url: text;
+};
+
+// ==== Pixel Creation Types ====
+
+type ProjectId = text;
+type VersionId = text;
+
+type PixelRow = vec nat16;
+
+type Frame = record {
+  duration_ms: nat32;
+  pixels: vec PixelRow;
+};
+
+type SourceMeta = record {
+  title: opt text;
+  description: opt text;
+  tags: opt vec text;
+};
+
+type PixelArtSource = record {
+  width: nat32;
+  height: nat32;
+  palette: vec text;
+  pixels: vec PixelRow;
+  frames: opt vec Frame;
+  metadata: opt SourceMeta;
+};
+
+type Version = record {
+  version_id: VersionId;
+  created_at: nat64;
+  editor: principal;
+  message: opt text;
+  source: PixelArtSource;
+};
+
+type Project = record {
+  project_id: ProjectId;
+  owner: principal;
+  created_at: nat64;
+  updated_at: nat64;
+  current_version: Version;
+  history: vec Version;
+};
+
 service : {
   // Basic API
   "greet": (text) -> (text) query;
@@ -502,4 +745,73 @@ service : {
   update_recharge_principal_account_api: (RechargePrincipalAccount) -> (variant { Ok; Err: text });
   delete_recharge_principal_account_api: () -> (variant { Ok; Err: text });
   list_recharge_principal_accounts_api: () -> (vec RechargePrincipalAccount) query;
+
+  // User Profile API
+  "upsert_user_profile": (UserProfile) -> (variant { Ok: nat64; Err: text });
+  "get_user_profile_by_principal": (text) -> (opt UserProfile) query;
+  "get_user_profile_by_user_id": (text) -> (opt UserProfile) query;
+  "get_user_profile_by_email": (text) -> (opt UserProfile) query;
+  "update_user_nickname": (text, text) -> (variant { Ok: UserProfile; Err: text });
+  "get_user_profiles_paginated": (nat64, nat64) -> (vec UserProfile) query;
+  "delete_user_profile": (text) -> (variant { Ok: bool; Err: text });
+  "get_total_user_profiles": () -> (nat64) query;
+
+  // Contact API
+  "upsert_contact": (Contact) -> (variant { Ok: nat64; Err: text });
+  "get_contacts_by_owner": (text) -> (vec Contact) query;
+  "get_contacts_by_owner_paginated": (text, nat64, nat64) -> (vec Contact) query;
+  "get_contact_by_id": (nat64) -> (opt Contact) query;
+  "get_contact_by_principal_ids": (text, text) -> (opt Contact) query;
+  "search_contacts_by_name": (text, text) -> (vec Contact) query;
+  "update_contact_status": (text, text, ContactStatus) -> (variant { Ok: Contact; Err: text });
+  "update_contact_nickname": (text, text, text) -> (variant { Ok: Contact; Err: text });
+  "update_contact_devices": (text, text, vec text) -> (variant { Ok: Contact; Err: text });
+  "update_contact_online_status": (text, text, bool) -> (variant { Ok: Contact; Err: text });
+  "delete_contact": (text, text) -> (variant { Ok: bool; Err: text });
+  "get_total_contacts_by_owner": (text) -> (nat64) query;
+  "create_contact_from_principal_id": (text, text, opt text) -> (variant { Ok: nat64; Err: text });
+
+  // User Device Management API
+  "add_user_device": (text, text) -> (variant { Ok: UserProfile; Err: text });
+  "remove_user_device": (text, text) -> (variant { Ok: UserProfile; Err: text });
+  "update_user_devices": (text, vec text) -> (variant { Ok: UserProfile; Err: text });
+
+  // Social Chat API
+  "generate_social_pair_key": (text, text) -> (text) query;
+  "send_chat_message": (text, text, text, MessageMode) -> (variant { Ok: nat64; Err: text });
+  "get_recent_chat_messages": (text, text) -> (vec ChatMessage) query;
+  "get_chat_messages_paginated": (text, text, nat64, nat64) -> (vec ChatMessage) query;
+  "get_chat_message_count": (text, text) -> (nat64) query;
+  "pop_notification": (text) -> (opt NotificationItem);
+  "get_notifications_for_receiver": (text) -> (vec NotificationItem) query;
+  "clear_notifications_for_pair": (text, text) -> (variant { Ok: nat64; Err: text });
+
+  // Pixel Creation API
+  "create_pixel_project": (text, PixelArtSource, opt text) -> (variant { Ok: ProjectId; Err: text });
+  "save_pixel_version": (text, ProjectId, PixelArtSource, opt text, opt text) -> (variant { Ok: VersionId; Err: text });
+  "get_pixel_project": (ProjectId) -> (opt Project) query;
+  "get_pixel_version": (ProjectId, VersionId) -> (opt Version) query;
+  "get_pixel_current_source": (ProjectId) -> (opt PixelArtSource) query;
+  "export_pixel_for_device": (ProjectId, opt VersionId) -> (variant { Ok: text; Err: text }) query;
+  "list_pixel_projects_by_owner": (principal, nat32, nat32) -> (vec Project) query;
+  "get_pixel_project_count_by_owner": (principal) -> (nat64) query;
+  "delete_pixel_project": (text, ProjectId) -> (variant { Ok: bool; Err: text });
+  "get_pixel_projects_paginated": (nat64, nat64) -> (vec Project) query;
+  "get_total_pixel_project_count": () -> (nat64) query;
+
+  // Device Management API
+  "add_device": (DeviceInfo) -> (variant { Ok: nat64; Err: text });
+  "get_device_by_id": (text) -> (opt DeviceInfo) query;
+  "get_devices_by_owner": (text) -> (vec DeviceInfo) query;
+  "update_device": (text, DeviceInfo) -> (variant { Ok; Err: text });
+  "delete_device": (text) -> (variant { Ok; Err: text });
+  "get_all_devices": (nat64, nat64) -> (DeviceListResponse) query;
+  "search_devices": (DeviceFilter) -> (vec DeviceInfo) query;
+  "update_device_status": (text, DeviceStatus) -> (variant { Ok; Err: text });
+  "update_device_last_seen": (text) -> (variant { Ok; Err: text });
+
+  // Order Management API
+  "admin_set_bitpay_pos_token": (text) -> ();
+  "create_order_and_invoice": (CreateOrderArgs) -> (variant { Ok: InvoiceResp; Err: text });
+  "get_order_by_id": (text) -> (opt Order) query;
 }

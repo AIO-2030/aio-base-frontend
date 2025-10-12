@@ -50,6 +50,50 @@ export interface CallItem {
   'outputs' : Array<IOData>,
   'call_type' : string,
 }
+export interface ChatHistory {
+  'updated_at' : bigint,
+  'social_pair_key' : string,
+  'messages' : Array<ChatMessage>,
+  'created_at' : bigint,
+}
+export interface ChatMessage {
+  'content' : string,
+  'mode' : MessageMode,
+  'timestamp' : bigint,
+  'send_by' : string,
+}
+export interface Contact {
+  'id' : bigint,
+  'status' : ContactStatus,
+  'updated_at' : bigint,
+  'nickname' : [] | [string],
+  'metadata' : [] | [string],
+  'name' : string,
+  'created_at' : bigint,
+  'owner_principal_id' : string,
+  'is_online' : boolean,
+  'contact_type' : ContactType,
+  'devices' : Array<string>,
+  'contact_principal_id' : string,
+  'avatar' : [] | [string],
+}
+export type ContactStatus = { 'Blocked' : null } |
+  { 'Active' : null } |
+  { 'Deleted' : null } |
+  { 'Pending' : null };
+export type ContactType = { 'Family' : null } |
+  { 'System' : null } |
+  { 'Business' : null } |
+  { 'Friend' : null };
+export interface CreateOrderArgs {
+  'sku' : string,
+  'redirect_base' : string,
+  'shipping_address' : string,
+  'buyer_email' : [] | [string],
+  'currency' : string,
+  'order_id' : string,
+  'amount' : number,
+}
 export interface CreditActivity {
   'status' : TransferStatus,
   'activity_type' : CreditActivityType,
@@ -63,6 +107,47 @@ export type CreditActivityType = { 'Spend' : null } |
   { 'Earn' : null } |
   { 'Reward' : null } |
   { 'Unstack' : null };
+export type DeviceCapability = { 'Storage' : null } |
+  { 'Network' : null } |
+  { 'Compute' : null } |
+  { 'Custom' : string } |
+  { 'Sensor' : null } |
+  { 'Audio' : null } |
+  { 'Video' : null };
+export interface DeviceFilter {
+  'status' : [] | [DeviceStatus],
+  'owner' : [] | [Principal],
+  'device_type' : [] | [DeviceType],
+  'capability' : [] | [DeviceCapability],
+}
+export interface DeviceInfo {
+  'id' : string,
+  'status' : DeviceStatus,
+  'updated_at' : bigint,
+  'capabilities' : Array<DeviceCapability>,
+  'owner' : Principal,
+  'metadata' : Array<[string, string]>,
+  'name' : string,
+  'device_type' : DeviceType,
+  'created_at' : bigint,
+  'last_seen' : bigint,
+}
+export interface DeviceListResponse {
+  'total' : bigint,
+  'offset' : bigint,
+  'limit' : bigint,
+  'devices' : Array<DeviceInfo>,
+}
+export type DeviceStatus = { 'Online' : null } |
+  { 'Disabled' : null } |
+  { 'Maintenance' : null } |
+  { 'Offline' : null };
+export type DeviceType = { 'IoT' : null } |
+  { 'Server' : null } |
+  { 'Embedded' : null } |
+  { 'Other' : string } |
+  { 'Desktop' : null } |
+  { 'Mobile' : null };
 export interface EmissionPolicy {
   'subscription_multipliers' : Array<[SubscriptionPlan, number]>,
   'last_update_time' : bigint,
@@ -70,6 +155,7 @@ export interface EmissionPolicy {
   'kappa_factor' : number,
   'staking_bonus' : number,
 }
+export interface Frame { 'pixels' : Array<PixelRow>, 'duration_ms' : number }
 export type GrantAction = { 'NewUser' : null } |
   { 'NewDeveloper' : null };
 export interface GrantPolicy {
@@ -101,6 +187,12 @@ export interface InvertedIndexItem {
   'keyword' : string,
   'confidence' : number,
 }
+export interface InvoiceResp { 'invoice_id' : string, 'invoice_url' : string }
+export type LoginMethod = { 'II' : null } |
+  { 'Google' : null } |
+  { 'Wallet' : null };
+export type LoginStatus = { 'Authenticated' : null } |
+  { 'Unauthenticated' : null };
 export interface McpItem {
   'id' : bigint,
   'tools' : boolean,
@@ -125,6 +217,12 @@ export interface McpStackRecord {
   'stack_status' : StackStatus,
   'principal_id' : string,
 }
+export type MessageMode = { 'Gif' : null } |
+  { 'Emoji' : null } |
+  { 'Text' : null } |
+  { 'Image' : null } |
+  { 'PixelArt' : null } |
+  { 'Voice' : null };
 export interface Method {
   'name' : string,
   'description' : string,
@@ -139,9 +237,64 @@ export interface NewMcpGrant {
   'start_time' : bigint,
   'amount' : bigint,
 }
+export interface NotificationItem {
+  'social_pair_key' : string,
+  'to_who' : string,
+  'timestamp' : bigint,
+  'message_id' : bigint,
+}
+export interface Order {
+  'sku' : string,
+  'status' : OrderStatus,
+  'shipment_no' : [] | [string],
+  'shipping_address' : string,
+  'updated_at_ns' : bigint,
+  'buyer_email' : [] | [string],
+  'created_at_ns' : bigint,
+  'currency' : string,
+  'order_id' : string,
+  'amount' : number,
+  'bitpay_invoice_url' : [] | [string],
+  'bitpay_invoice_id' : [] | [string],
+}
+export type OrderStatus = { 'New' : null } |
+  { 'Invalid' : null } |
+  { 'Paid' : null } |
+  { 'Delivered' : null } |
+  { 'Complete' : null } |
+  { 'Confirmed' : null } |
+  { 'Created' : null } |
+  { 'Expired' : null };
+export interface PixelArtData {
+  'height' : number,
+  'device_format' : string,
+  'chat_format' : string,
+  'source_id' : [] | [string],
+  'palette' : Array<string>,
+  'source_type' : string,
+  'width' : number,
+}
+export interface PixelArtSource {
+  'height' : number,
+  'metadata' : [] | [SourceMeta],
+  'palette' : Array<string>,
+  'pixels' : Array<PixelRow>,
+  'frames' : [] | [Array<Frame>],
+  'width' : number,
+}
+export type PixelRow = Uint16Array | number[];
 export type Platform = { 'Linux' : null } |
   { 'Both' : null } |
   { 'Windows' : null };
+export interface Project {
+  'updated_at' : bigint,
+  'owner' : Principal,
+  'history' : Array<Version>,
+  'created_at' : bigint,
+  'current_version' : Version,
+  'project_id' : ProjectId,
+}
+export type ProjectId = string;
 export interface ProtocolCall {
   'id' : number,
   'protocol' : string,
@@ -186,6 +339,11 @@ export interface Source {
   'author' : string,
   'version' : string,
   'github' : string,
+}
+export interface SourceMeta {
+  'title' : [] | [string],
+  'tags' : [] | [Array<string>],
+  'description' : [] | [string],
 }
 export interface StackPositionRecord {
   'id' : bigint,
@@ -261,6 +419,29 @@ export type TraceStatus = { 'Ok' : null } |
 export type TransferStatus = { 'Failed' : null } |
   { 'Completed' : null } |
   { 'Pending' : null };
+export interface UserProfile {
+  'updated_at' : bigint,
+  'nickname' : string,
+  'metadata' : [] | [string],
+  'name' : [] | [string],
+  'wallet_address' : [] | [string],
+  'created_at' : bigint,
+  'user_id' : string,
+  'email' : [] | [string],
+  'picture' : [] | [string],
+  'login_status' : LoginStatus,
+  'login_method' : LoginMethod,
+  'principal_id' : string,
+  'devices' : Array<string>,
+}
+export interface Version {
+  'version_id' : VersionId,
+  'source' : PixelArtSource,
+  'editor' : Principal,
+  'created_at' : bigint,
+  'message' : [] | [string],
+}
+export type VersionId = string;
 export interface WorkItem {
   'id' : bigint,
   'status' : WorkStatus,
@@ -288,6 +469,11 @@ export interface _SERVICE {
     { 'Ok' : bigint } |
       { 'Err' : string }
   >,
+  'add_device' : ActorMethod<
+    [DeviceInfo],
+    { 'Ok' : bigint } |
+      { 'Err' : string }
+  >,
   'add_mcp_item' : ActorMethod<
     [McpItem, string],
     { 'Ok' : string } |
@@ -303,6 +489,12 @@ export interface _SERVICE {
     { 'Ok' : AccountInfo } |
       { 'Err' : string }
   >,
+  'add_user_device' : ActorMethod<
+    [string, string],
+    { 'Ok' : UserProfile } |
+      { 'Err' : string }
+  >,
+  'admin_set_bitpay_pos_token' : ActorMethod<[string], undefined>,
   'cal_unclaim_rewards' : ActorMethod<[string], bigint>,
   'calculate_emission' : ActorMethod<
     [string],
@@ -318,6 +510,11 @@ export interface _SERVICE {
   >,
   'claim_rewards' : ActorMethod<
     [string],
+    { 'Ok' : bigint } |
+      { 'Err' : string }
+  >,
+  'clear_notifications_for_pair' : ActorMethod<
+    [string, string],
     { 'Ok' : bigint } |
       { 'Err' : string }
   >,
@@ -341,9 +538,24 @@ export interface _SERVICE {
     { 'Ok' : bigint } |
       { 'Err' : string }
   >,
+  'create_contact_from_principal_id' : ActorMethod<
+    [string, string, [] | [string]],
+    { 'Ok' : bigint } |
+      { 'Err' : string }
+  >,
   'create_mcp_grant' : ActorMethod<
     [NewMcpGrant],
     { 'Ok' : null } |
+      { 'Err' : string }
+  >,
+  'create_order_and_invoice' : ActorMethod<
+    [CreateOrderArgs],
+    { 'Ok' : InvoiceResp } |
+      { 'Err' : string }
+  >,
+  'create_pixel_project' : ActorMethod<
+    [string, PixelArtSource, [] | [string]],
+    { 'Ok' : ProjectId } |
       { 'Err' : string }
   >,
   'create_token_grant' : ActorMethod<
@@ -361,6 +573,12 @@ export interface _SERVICE {
     { 'Ok' : null } |
       { 'Err' : string }
   >,
+  'delete_contact' : ActorMethod<
+    [string, string],
+    { 'Ok' : boolean } |
+      { 'Err' : string }
+  >,
+  'delete_device' : ActorMethod<[string], { 'Ok' : null } | { 'Err' : string }>,
   'delete_inverted_index_by_mcp' : ActorMethod<
     [string],
     { 'Ok' : null } |
@@ -371,9 +589,19 @@ export interface _SERVICE {
     { 'Ok' : null } |
       { 'Err' : string }
   >,
+  'delete_pixel_project' : ActorMethod<
+    [string, ProjectId],
+    { 'Ok' : boolean } |
+      { 'Err' : string }
+  >,
   'delete_recharge_principal_account_api' : ActorMethod<
     [],
     { 'Ok' : null } |
+      { 'Err' : string }
+  >,
+  'delete_user_profile' : ActorMethod<
+    [string],
+    { 'Ok' : boolean } |
       { 'Err' : string }
   >,
   'dispatch_mining_rewards' : ActorMethod<
@@ -386,6 +614,11 @@ export interface _SERVICE {
     { 'Ok' : string } |
       { 'Err' : string }
   >,
+  'export_pixel_for_device' : ActorMethod<
+    [ProjectId, [] | [VersionId]],
+    { 'Ok' : string } |
+      { 'Err' : string }
+  >,
   'find_inverted_index_by_confidence' : ActorMethod<[number], string>,
   'find_inverted_index_by_group' : ActorMethod<[string], string>,
   'find_inverted_index_by_keyword' : ActorMethod<[string], string>,
@@ -394,6 +627,7 @@ export interface _SERVICE {
     string
   >,
   'find_inverted_index_by_mcp' : ActorMethod<[string], string>,
+  'generate_social_pair_key' : ActorMethod<[string, string], string>,
   'get_account_info' : ActorMethod<[string], [] | [AccountInfo]>,
   'get_accounts_paginated' : ActorMethod<[bigint, bigint], Array<AccountInfo>>,
   'get_agent_item' : ActorMethod<[bigint], [] | [AgentItem]>,
@@ -405,6 +639,7 @@ export interface _SERVICE {
   'get_all_accounts' : ActorMethod<[], Array<AccountInfo>>,
   'get_all_agent_items' : ActorMethod<[], Array<AgentItem>>,
   'get_all_aio_indices' : ActorMethod<[], Array<AioIndex>>,
+  'get_all_devices' : ActorMethod<[bigint, bigint], DeviceListResponse>,
   'get_all_inverted_index_items' : ActorMethod<[], string>,
   'get_all_keywords' : ActorMethod<[], string>,
   'get_all_mcp_grants' : ActorMethod<[], Array<NewMcpGrant>>,
@@ -420,6 +655,21 @@ export interface _SERVICE {
       'success_count' : bigint,
       'total_count' : bigint,
     }
+  >,
+  'get_chat_message_count' : ActorMethod<[string, string], bigint>,
+  'get_chat_messages_paginated' : ActorMethod<
+    [string, string, bigint, bigint],
+    Array<ChatMessage>
+  >,
+  'get_contact_by_id' : ActorMethod<[bigint], [] | [Contact]>,
+  'get_contact_by_principal_ids' : ActorMethod<
+    [string, string],
+    [] | [Contact]
+  >,
+  'get_contacts_by_owner' : ActorMethod<[string], Array<Contact>>,
+  'get_contacts_by_owner_paginated' : ActorMethod<
+    [string, bigint, bigint],
+    Array<Contact>
   >,
   'get_credit_activities' : ActorMethod<[string], Array<CreditActivity>>,
   'get_credit_activities_by_time_period' : ActorMethod<
@@ -443,6 +693,8 @@ export interface _SERVICE {
     }
   >,
   'get_credits_per_icp_api' : ActorMethod<[], bigint>,
+  'get_device_by_id' : ActorMethod<[string], [] | [DeviceInfo]>,
+  'get_devices_by_owner' : ActorMethod<[string], Array<DeviceInfo>>,
   'get_emission_policy' : ActorMethod<
     [],
     { 'Ok' : EmissionPolicy } |
@@ -471,6 +723,23 @@ export interface _SERVICE {
   'get_mcp_stack_records_paginated' : ActorMethod<
     [string, bigint, bigint],
     Array<McpStackRecord>
+  >,
+  'get_notifications_for_receiver' : ActorMethod<
+    [string],
+    Array<NotificationItem>
+  >,
+  'get_order_by_id' : ActorMethod<[string], [] | [Order]>,
+  'get_pixel_current_source' : ActorMethod<[ProjectId], [] | [PixelArtSource]>,
+  'get_pixel_project' : ActorMethod<[ProjectId], [] | [Project]>,
+  'get_pixel_project_count_by_owner' : ActorMethod<[Principal], bigint>,
+  'get_pixel_projects_paginated' : ActorMethod<
+    [bigint, bigint],
+    Array<Project>
+  >,
+  'get_pixel_version' : ActorMethod<[ProjectId, VersionId], [] | [Version]>,
+  'get_recent_chat_messages' : ActorMethod<
+    [string, string],
+    Array<ChatMessage>
   >,
   'get_recharge_history_api' : ActorMethod<
     [string, bigint, bigint],
@@ -514,7 +783,10 @@ export interface _SERVICE {
     Array<TokenGrant>
   >,
   'get_total_aiotoken_claimable' : ActorMethod<[], bigint>,
+  'get_total_contacts_by_owner' : ActorMethod<[string], bigint>,
+  'get_total_pixel_project_count' : ActorMethod<[], bigint>,
   'get_total_stacked_credits' : ActorMethod<[], bigint>,
+  'get_total_user_profiles' : ActorMethod<[], bigint>,
   'get_trace' : ActorMethod<[string], [] | [TraceLog]>,
   'get_trace_by_context' : ActorMethod<[string], [] | [TraceLog]>,
   'get_traces_by_agentname_paginated' : ActorMethod<
@@ -580,6 +852,13 @@ export interface _SERVICE {
     [bigint, bigint],
     Array<McpItem>
   >,
+  'get_user_profile_by_email' : ActorMethod<[string], [] | [UserProfile]>,
+  'get_user_profile_by_principal' : ActorMethod<[string], [] | [UserProfile]>,
+  'get_user_profile_by_user_id' : ActorMethod<[string], [] | [UserProfile]>,
+  'get_user_profiles_paginated' : ActorMethod<
+    [bigint, bigint],
+    Array<UserProfile>
+  >,
   'grant_token' : ActorMethod<
     [TokenGrant],
     { 'Ok' : null } |
@@ -588,6 +867,10 @@ export interface _SERVICE {
   'greet' : ActorMethod<[string], string>,
   'init_emission_policy' : ActorMethod<[], undefined>,
   'init_grant_policy' : ActorMethod<[[] | [GrantPolicy]], undefined>,
+  'list_pixel_projects_by_owner' : ActorMethod<
+    [Principal, number, number],
+    Array<Project>
+  >,
   'list_recharge_principal_accounts_api' : ActorMethod<
     [],
     Array<RechargePrincipalAccount>
@@ -602,6 +885,7 @@ export interface _SERVICE {
     { 'Ok' : Array<RewardEntry> } |
       { 'Err' : string }
   >,
+  'pop_notification' : ActorMethod<[string], [] | [NotificationItem]>,
   'recharge_and_convert_credits_api' : ActorMethod<[number], bigint>,
   'record_trace_call' : ActorMethod<
     [
@@ -619,11 +903,28 @@ export interface _SERVICE {
     { 'Ok' : null } |
       { 'Err' : string }
   >,
+  'remove_user_device' : ActorMethod<
+    [string, string],
+    { 'Ok' : UserProfile } |
+      { 'Err' : string }
+  >,
   'revert_Index_find_by_keywords_strategy' : ActorMethod<
     [Array<string>],
     string
   >,
+  'save_pixel_version' : ActorMethod<
+    [string, ProjectId, PixelArtSource, [] | [string], [] | [string]],
+    { 'Ok' : VersionId } |
+      { 'Err' : string }
+  >,
   'search_aio_indices_by_keyword' : ActorMethod<[string], Array<AioIndex>>,
+  'search_contacts_by_name' : ActorMethod<[string, string], Array<Contact>>,
+  'search_devices' : ActorMethod<[DeviceFilter], Array<DeviceInfo>>,
+  'send_chat_message' : ActorMethod<
+    [string, string, string, MessageMode],
+    { 'Ok' : bigint } |
+      { 'Err' : string }
+  >,
   'simulate_credit_from_icp_api' : ActorMethod<[number], bigint>,
   'stack_credit' : ActorMethod<
     [string, string, bigint],
@@ -661,6 +962,41 @@ export interface _SERVICE {
     { 'Ok' : null } |
       { 'Err' : string }
   >,
+  'update_contact_devices' : ActorMethod<
+    [string, string, Array<string>],
+    { 'Ok' : Contact } |
+      { 'Err' : string }
+  >,
+  'update_contact_nickname' : ActorMethod<
+    [string, string, string],
+    { 'Ok' : Contact } |
+      { 'Err' : string }
+  >,
+  'update_contact_online_status' : ActorMethod<
+    [string, string, boolean],
+    { 'Ok' : Contact } |
+      { 'Err' : string }
+  >,
+  'update_contact_status' : ActorMethod<
+    [string, string, ContactStatus],
+    { 'Ok' : Contact } |
+      { 'Err' : string }
+  >,
+  'update_device' : ActorMethod<
+    [string, DeviceInfo],
+    { 'Ok' : null } |
+      { 'Err' : string }
+  >,
+  'update_device_last_seen' : ActorMethod<
+    [string],
+    { 'Ok' : null } |
+      { 'Err' : string }
+  >,
+  'update_device_status' : ActorMethod<
+    [string, DeviceStatus],
+    { 'Ok' : null } |
+      { 'Err' : string }
+  >,
   'update_emission_policy' : ActorMethod<
     [EmissionPolicy],
     { 'Ok' : null } |
@@ -684,6 +1020,26 @@ export interface _SERVICE {
   'update_recharge_principal_account_api' : ActorMethod<
     [RechargePrincipalAccount],
     { 'Ok' : null } |
+      { 'Err' : string }
+  >,
+  'update_user_devices' : ActorMethod<
+    [string, Array<string>],
+    { 'Ok' : UserProfile } |
+      { 'Err' : string }
+  >,
+  'update_user_nickname' : ActorMethod<
+    [string, string],
+    { 'Ok' : UserProfile } |
+      { 'Err' : string }
+  >,
+  'upsert_contact' : ActorMethod<
+    [Contact],
+    { 'Ok' : bigint } |
+      { 'Err' : string }
+  >,
+  'upsert_user_profile' : ActorMethod<
+    [UserProfile],
+    { 'Ok' : bigint } |
       { 'Err' : string }
   >,
   'use_credit' : ActorMethod<
