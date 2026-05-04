@@ -192,7 +192,7 @@ export const executeRpc = async (
     let baseUrl;
     if (isProduction) {
       // Production environment uses remote MCP service directly with HTTPS
-      baseUrl = 'https://mcp.aio2030.fun/api/v1/rpc';
+      baseUrl = 'https://mcp.univoices.club/api/v1/rpc';
       console.log(`[executeRpc] Using production MCP server: ${baseUrl}`);
     } else {
       // Development environment uses environment variables with HTTPS fallback

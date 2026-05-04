@@ -8,8 +8,8 @@ const isProduction = () => {
 
 // File service API base URL
 const FILE_SERVICE_URL = isProduction()
-  ? 'https://mcp.aio2030.fun/upload'  // Production environment uses remote file service directly
-  : (import.meta.env.VITE_FILE_SERVICE_URL || 'https://mcp.aio2030.fun/upload');
+  ? 'https://mcp.univoices.club/upload'  // Production environment uses remote file service directly
+  : (import.meta.env.VITE_FILE_SERVICE_URL || 'https://mcp.univoices.club/upload');
 
 // Setup logger for file operations
 const logFileOp = (operation: string, message: string, data?: any) => {
@@ -187,7 +187,7 @@ export const downloadImageFile = async (
     logFileOp('DOWNLOAD', 'Parsed filepath components', { fileType, filename, originalPath: filepath });
     
     // Use new domain for downloads
-    const downloadBaseUrl = import.meta.env.VITE_DOWNLOAD_BASE_URL || 'https://mcp.aio2030.fun/api/v1';
+    const downloadBaseUrl = import.meta.env.VITE_DOWNLOAD_BASE_URL || 'https://mcp.univoices.club/api/v1';
     
     // Construct the URL according to required pattern with correct type
     const downloadUrl = `${downloadBaseUrl}?type=${fileType}&filename=${encodeURIComponent(filename)}`;
@@ -304,7 +304,7 @@ export const getImageDownloadUrl = async (filepath: string): Promise<string> => 
     logFileOp('GET_URL', 'Parsed filepath components', { fileType, filename, originalPath: filepath });
     
     // Use new domain for downloads
-    const downloadBaseUrl = import.meta.env.VITE_DOWNLOAD_BASE_URL || 'https://mcp.aio2030.fun/api/v1';
+    const downloadBaseUrl = import.meta.env.VITE_DOWNLOAD_BASE_URL || 'https://mcp.univoices.club/api/v1';
     
     // Format the URL according to required pattern with correct type
     const url = `${downloadBaseUrl}?type=${fileType}&filename=${encodeURIComponent(filename)}`;
@@ -317,7 +317,7 @@ export const getImageDownloadUrl = async (filepath: string): Promise<string> => 
     console.error('Error creating image download URL:', error);
     
     // Return basic fallback URL in case of error
-    const fallbackUrl = `https://mcp.aio2030.fun/api/v1?filepath=${encodeURIComponent(filepath)}`;
+    const fallbackUrl = `https://mcp.univoices.club/api/v1?filepath=${encodeURIComponent(filepath)}`;
     logFileOp('GET_URL', 'Using fallback URL format', { fallbackUrl });
     
     return fallbackUrl;

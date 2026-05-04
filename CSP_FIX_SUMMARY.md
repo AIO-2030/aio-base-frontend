@@ -2,7 +2,7 @@
 
 ## Problem
 ```
-Refused to connect to 'https://mcp.aio2030.fun/upload/mcp' because it violates the following Content Security Policy directive: "connect-src 'self' blob: http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:* http://8.141.81.75:* https://8.141.81.75:* http://8.141.81.75:8001/upload/mcp https://8.141.81.75:8001/upload/mcp https://icp0.io https://*.icp0.io https://icp-api.io https://ic0.app https://*.ic0.app https://openapi.emchub.ai https://*.emchub.ai https://api.siliconflow.cn https://cdn.gpteng.co ws: wss:"
+Refused to connect to 'https://mcp.univoices.club/upload/mcp' because it violates the following Content Security Policy directive: "connect-src 'self' blob: http://localhost:* https://localhost:* http://127.0.0.1:* https://127.0.0.1:* http://8.141.81.75:* https://8.141.81.75:* http://8.141.81.75:8001/upload/mcp https://8.141.81.75:8001/upload/mcp https://icp0.io https://*.icp0.io https://icp-api.io https://ic0.app https://*.ic0.app https://openapi.emchub.ai https://*.emchub.ai https://api.siliconflow.cn https://cdn.gpteng.co ws: wss:"
 ```
 
 ## Root Cause
@@ -29,7 +29,7 @@ http://8.141.81.75:* https://8.141.81.75:* http://8.141.81.75:8001/upload/mcp ht
 
 **After:**
 ```
-https://mcp.aio2030.fun https://*.aio2030.fun
+https://mcp.univoices.club https://*.univoices.club
 ```
 
 ### URL Configuration
@@ -37,7 +37,7 @@ https://mcp.aio2030.fun https://*.aio2030.fun
 ```typescript
 getFullUploadUrl(type: 'mcp' | 'agent' | 'img'): string {
   return `${this.BASE_URL}${this.ENDPOINTS.UPLOAD[type.toUpperCase()]}`;
-  // Result: https://mcp.aio2030.fun/api/v1/upload/mcp (WRONG)
+  // Result: https://mcp.univoices.club/api/v1/upload/mcp (WRONG)
 }
 ```
 
@@ -45,24 +45,24 @@ getFullUploadUrl(type: 'mcp' | 'agent' | 'img'): string {
 ```typescript
 getFullUploadUrl(type: 'mcp' | 'agent' | 'img'): string {
   const uploadBaseUrl = isProduction() 
-    ? 'https://mcp.aio2030.fun/upload'
-    : getEnvVar('VITE_FILE_SERVICE_URL', 'https://mcp.aio2030.fun/upload');
+    ? 'https://mcp.univoices.club/upload'
+    : getEnvVar('VITE_FILE_SERVICE_URL', 'https://mcp.univoices.club/upload');
   return `${uploadBaseUrl}/${type}`;
-  // Result: https://mcp.aio2030.fun/upload/mcp (CORRECT)
+  // Result: https://mcp.univoices.club/upload/mcp (CORRECT)
 }
 ```
 
 ## Expected URLs
 
 ### ✅ Correct URLs
-- **MCP Upload**: `https://mcp.aio2030.fun/upload/mcp`
-- **Agent Upload**: `https://mcp.aio2030.fun/upload/agent`
-- **Image Upload**: `https://mcp.aio2030.fun/upload/img`
-- **MCP RPC**: `https://mcp.aio2030.fun/api/v1/rpc/mcp/mcp_voice`
-- **File Download**: `https://mcp.aio2030.fun/api/v1?type=mcp&filename=test.mcp`
+- **MCP Upload**: `https://mcp.univoices.club/upload/mcp`
+- **Agent Upload**: `https://mcp.univoices.club/upload/agent`
+- **Image Upload**: `https://mcp.univoices.club/upload/img`
+- **MCP RPC**: `https://mcp.univoices.club/api/v1/rpc/mcp/mcp_voice`
+- **File Download**: `https://mcp.univoices.club/api/v1?type=mcp&filename=test.mcp`
 
 ### ❌ Wrong URLs (Fixed)
-- **MCP Upload**: `https://mcp.aio2030.fun/api/v1/upload/mcp` ❌
+- **MCP Upload**: `https://mcp.univoices.club/api/v1/upload/mcp` ❌
 - **Old IP URLs**: `http://8.141.81.75:*` ❌
 
 ## Troubleshooting Steps
@@ -89,7 +89,7 @@ npm run dev
 
 ### 4. Verify CSP Headers
 - Check Network tab for CSP headers
-- Should see: `https://mcp.aio2030.fun https://*.aio2030.fun`
+- Should see: `https://mcp.univoices.club https://*.univoices.club`
 - Should NOT see: `http://8.141.81.75:* https://8.141.81.75:*`
 
 ## Verification Commands
@@ -106,7 +106,7 @@ node test_all_csp.js
 
 ### Verify File Modifications
 ```bash
-grep -r "mcp.aio2030.fun" src/ --include="*.ts" --include="*.tsx"
+grep -r "mcp.univoices.club" src/ --include="*.ts" --include="*.tsx"
 grep -r "8.141.81.75" src/ --include="*.ts" --include="*.tsx"
 ```
 

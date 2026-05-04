@@ -7,8 +7,8 @@ function checkCspConfigurations() {
   
   const cspSources = [
     // Should be present (new domain)
-    'https://mcp.aio2030.fun',
-    'https://*.aio2030.fun',
+    'https://mcp.univoices.club',
+    'https://*.univoices.club',
     
     // Should NOT be present (old IP addresses)
     'http://8.141.81.75',
@@ -21,7 +21,7 @@ function checkCspConfigurations() {
   
   console.log('Checking CSP sources:');
   cspSources.forEach(source => {
-    const isNewDomain = source.includes('mcp.aio2030.fun');
+    const isNewDomain = source.includes('mcp.univoices.club');
     const isOldIP = source.includes('8.141.81.75');
     
     if (isNewDomain) {
@@ -41,17 +41,17 @@ function checkUrlConfigurations() {
   const expectedUrls = [
     {
       name: 'MCP Upload',
-      correct: 'https://mcp.aio2030.fun/upload/mcp',
-      wrong: 'https://mcp.aio2030.fun/api/v1/upload/mcp'
+      correct: 'https://mcp.univoices.club/upload/mcp',
+      wrong: 'https://mcp.univoices.club/api/v1/upload/mcp'
     },
     {
       name: 'MCP RPC',
-      correct: 'https://mcp.aio2030.fun/api/v1/rpc/mcp/mcp_voice',
+      correct: 'https://mcp.univoices.club/api/v1/rpc/mcp/mcp_voice',
       wrong: 'http://8.141.81.75:8000/api/v1/rpc/mcp/mcp_voice'
     },
     {
       name: 'File Download',
-      correct: 'https://mcp.aio2030.fun/api/v1?type=mcp&filename=test.mcp',
+      correct: 'https://mcp.univoices.club/api/v1?type=mcp&filename=test.mcp',
       wrong: 'http://8.141.81.75:8001/api/v1?type=mcp&filename=test.mcp'
     }
   ];
@@ -136,7 +136,7 @@ function checkDebuggingSteps() {
   console.log('');
   
   console.log('Expected behavior:');
-  console.log('- File upload should use: https://mcp.aio2030.fun/upload/mcp');
+  console.log('- File upload should use: https://mcp.univoices.club/upload/mcp');
   console.log('- No CSP violations in console');
   console.log('- Network requests should show correct URLs');
   console.log('');

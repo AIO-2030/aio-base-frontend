@@ -18,7 +18,7 @@ const corsProxyDomains = [
   'localhost',
   '127.0.0.1',
   '8.141.81.75',
-  'mcp.aio2030.fun',
+  'mcp.univoices.club',
   '162.218.231.180',
   '18.167.51.1'
 ];

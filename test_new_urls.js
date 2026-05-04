@@ -3,9 +3,9 @@ console.log('🔍 Testing New URL Configuration\n');
 
 // Mock environment for testing
 const mockEnv = {
-  'VITE_AIO_MCP_API_URL': 'https://mcp.aio2030.fun/api/v1/rpc',
-  'VITE_AIO_MCP_FILE_URL': 'https://mcp.aio2030.fun/api/v1',
-  'VITE_DOWNLOAD_BASE_URL': 'https://mcp.aio2030.fun/api/v1'
+  'VITE_AIO_MCP_API_URL': 'https://mcp.univoices.club/api/v1/rpc',
+  'VITE_AIO_MCP_FILE_URL': 'https://mcp.univoices.club/api/v1',
+  'VITE_DOWNLOAD_BASE_URL': 'https://mcp.univoices.club/api/v1'
 };
 
 // Mock production detection
@@ -17,15 +17,15 @@ function testNewUrlConfiguration() {
   
   // Test production environment URLs
   const productionMcpUrl = isProduction() 
-    ? 'https://mcp.aio2030.fun/api/v1/rpc'
+    ? 'https://mcp.univoices.club/api/v1/rpc'
     : mockEnv['VITE_AIO_MCP_API_URL'];
   
   const productionFileUrl = isProduction()
-    ? 'https://mcp.aio2030.fun/api/v1'
+    ? 'https://mcp.univoices.club/api/v1'
     : mockEnv['VITE_AIO_MCP_FILE_URL'];
   
   const productionUploadUrl = isProduction()
-    ? 'https://mcp.aio2030.fun/upload'
+    ? 'https://mcp.univoices.club/upload'
     : mockEnv['VITE_AIO_MCP_FILE_URL'];
   
   console.log('Production MCP URL:', productionMcpUrl);
@@ -72,24 +72,24 @@ function testFileUploadUrls() {
   const uploadUrls = [
     {
       name: 'MCP Upload',
-      url: 'https://mcp.aio2030.fun/upload/mcp',
+      url: 'https://mcp.univoices.club/upload/mcp',
       expected: 'HTTPS upload endpoint'
     },
     {
       name: 'Agent Upload',
-      url: 'https://mcp.aio2030.fun/upload/agent',
+      url: 'https://mcp.univoices.club/upload/agent',
       expected: 'HTTPS upload endpoint'
     },
     {
       name: 'Image Upload',
-      url: 'https://mcp.aio2030.fun/upload/img',
+      url: 'https://mcp.univoices.club/upload/img',
       expected: 'HTTPS upload endpoint'
     }
   ];
   
   uploadUrls.forEach(({ name, url, expected }) => {
     const isHttps = url.startsWith('https://');
-    const isCorrectDomain = url.includes('mcp.aio2030.fun');
+    const isCorrectDomain = url.includes('mcp.univoices.club');
     console.log(`${name}: ${url} (HTTPS: ${isHttps}, Domain: ${isCorrectDomain})`);
   });
   
@@ -102,24 +102,24 @@ function testFileDownloadUrls() {
   const downloadUrls = [
     {
       name: 'MCP Download',
-      url: 'https://mcp.aio2030.fun/api/v1?type=mcp&filename=test.mcp',
+      url: 'https://mcp.univoices.club/api/v1?type=mcp&filename=test.mcp',
       expected: 'HTTPS download endpoint'
     },
     {
       name: 'Agent Download',
-      url: 'https://mcp.aio2030.fun/api/v1?type=agent&filename=test.agent',
+      url: 'https://mcp.univoices.club/api/v1?type=agent&filename=test.agent',
       expected: 'HTTPS download endpoint'
     },
     {
       name: 'Image Download',
-      url: 'https://mcp.aio2030.fun/api/v1?type=img&filename=test.png',
+      url: 'https://mcp.univoices.club/api/v1?type=img&filename=test.png',
       expected: 'HTTPS download endpoint'
     }
   ];
   
   downloadUrls.forEach(({ name, url, expected }) => {
     const isHttps = url.startsWith('https://');
-    const isCorrectDomain = url.includes('mcp.aio2030.fun');
+    const isCorrectDomain = url.includes('mcp.univoices.club');
     console.log(`${name}: ${url} (HTTPS: ${isHttps}, Domain: ${isCorrectDomain})`);
   });
   
@@ -132,13 +132,13 @@ function testViteProxyConfiguration() {
   const proxyConfigs = [
     {
       name: 'MCP Proxy',
-      target: 'https://mcp.aio2030.fun',
+      target: 'https://mcp.univoices.club',
       rewrite: '/api/mcp -> /api/v1/rpc',
       expected: 'HTTPS proxy to new domain'
     },
     {
       name: 'File Proxy',
-      target: 'https://mcp.aio2030.fun',
+      target: 'https://mcp.univoices.club',
       rewrite: '/api/files -> /api/v1',
       expected: 'HTTPS proxy to new domain'
     }
@@ -146,7 +146,7 @@ function testViteProxyConfiguration() {
   
   proxyConfigs.forEach(({ name, target, rewrite, expected }) => {
     const isHttps = target.startsWith('https://');
-    const isCorrectDomain = target.includes('mcp.aio2030.fun');
+    const isCorrectDomain = target.includes('mcp.univoices.club');
     console.log(`${name}: ${target} (HTTPS: ${isHttps}, Domain: ${isCorrectDomain})`);
     console.log(`  Rewrite: ${rewrite}`);
   });
@@ -158,15 +158,15 @@ function testAllConfigurations() {
   console.log('=== OVERALL VERIFICATION SUMMARY ===');
   
   const configurations = [
-    { name: 'API Config RPC', url: 'https://mcp.aio2030.fun/api/v1/rpc' },
-    { name: 'API Config File', url: 'https://mcp.aio2030.fun/api/v1' },
-    { name: 'API Context RPC', url: 'https://mcp.aio2030.fun/api/v1/rpc' },
-    { name: 'API Context File', url: 'https://mcp.aio2030.fun/api/v1' },
-    { name: 'ExecFileCommonBuss', url: 'https://mcp.aio2030.fun/api/v1/rpc' },
-    { name: 'AIO Protocol Executor', url: 'https://mcp.aio2030.fun/api/v1/rpc' },
-    { name: 'ExecFileUpload', url: 'https://mcp.aio2030.fun/upload' },
-    { name: 'ImgFileUpload', url: 'https://mcp.aio2030.fun/upload' },
-    { name: 'Vite Config Proxy', url: 'https://mcp.aio2030.fun' }
+    { name: 'API Config RPC', url: 'https://mcp.univoices.club/api/v1/rpc' },
+    { name: 'API Config File', url: 'https://mcp.univoices.club/api/v1' },
+    { name: 'API Context RPC', url: 'https://mcp.univoices.club/api/v1/rpc' },
+    { name: 'API Context File', url: 'https://mcp.univoices.club/api/v1' },
+    { name: 'ExecFileCommonBuss', url: 'https://mcp.univoices.club/api/v1/rpc' },
+    { name: 'AIO Protocol Executor', url: 'https://mcp.univoices.club/api/v1/rpc' },
+    { name: 'ExecFileUpload', url: 'https://mcp.univoices.club/upload' },
+    { name: 'ImgFileUpload', url: 'https://mcp.univoices.club/upload' },
+    { name: 'Vite Config Proxy', url: 'https://mcp.univoices.club' }
   ];
   
   let allHttps = true;
@@ -174,7 +174,7 @@ function testAllConfigurations() {
   
   configurations.forEach(config => {
     const isHttps = config.url.startsWith('https://');
-    const isCorrectDomain = config.url.includes('mcp.aio2030.fun');
+    const isCorrectDomain = config.url.includes('mcp.univoices.club');
     console.log(`${config.name}: ${isHttps ? '✅ HTTPS' : '❌ HTTP'} ${isCorrectDomain ? '✅ Domain' : '❌ Domain'}`);
     if (!isHttps) allHttps = false;
     if (!isCorrectDomain) allCorrectDomain = false;
@@ -184,7 +184,7 @@ function testAllConfigurations() {
   if (allHttps && allCorrectDomain) {
     console.log('🎉 ALL CONFIGURATIONS UPDATED SUCCESSFULLY!');
     console.log('✅ All URLs use HTTPS');
-    console.log('✅ All URLs use new domain (mcp.aio2030.fun)');
+    console.log('✅ All URLs use new domain (mcp.univoices.club)');
     console.log('✅ Ready for production deployment');
   } else {
     console.log('❌ Some configurations need updating');

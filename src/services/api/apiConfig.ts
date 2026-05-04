@@ -39,16 +39,16 @@ export { axiosInstance };
 export const API_CONFIG = {
   // Use complete URLs from environment variables - both dev and prod use HTTPS
   BASE_URL: isProduction() 
-    ? 'https://mcp.aio2030.fun/api/v1'  // Production environment uses remote file service with HTTPS
-    : getEnvVar('VITE_AIO_MCP_FILE_URL', 'https://mcp.aio2030.fun/api/v1'),  // Development also uses HTTPS
+    ? 'https://mcp.univoices.club/api/v1'  // Production environment uses remote file service with HTTPS
+    : getEnvVar('VITE_AIO_MCP_FILE_URL', 'https://mcp.univoices.club/api/v1'),  // Development also uses HTTPS
   API_VERSION: 'v1',
   get FULL_BASE_URL() {
     return this.BASE_URL;
   },
   get RPC_BASE_URL() {
     return isProduction()
-      ? 'https://mcp.aio2030.fun/api/v1/rpc'  // Production environment uses remote MCP service with HTTPS
-      : getEnvVar('VITE_AIO_MCP_API_URL', 'https://mcp.aio2030.fun/api/v1/rpc');  // Development also uses HTTPS
+      ? 'https://mcp.univoices.club/api/v1/rpc'  // Production environment uses remote MCP service with HTTPS
+      : getEnvVar('VITE_AIO_MCP_API_URL', 'https://mcp.univoices.club/api/v1/rpc');  // Development also uses HTTPS
   },
   ENDPOINTS: {
     UPLOAD: {
@@ -70,10 +70,10 @@ export const API_CONFIG = {
     }
   },
   getFullUploadUrl(type: 'mcp' | 'agent' | 'img'): string {
-    // Use direct upload URL format: https://mcp.aio2030.fun/upload/{type}
+    // Use direct upload URL format: https://mcp.univoices.club/upload/{type}
     const uploadBaseUrl = isProduction() 
-      ? 'https://mcp.aio2030.fun/upload'
-      : getEnvVar('VITE_FILE_SERVICE_URL', 'https://mcp.aio2030.fun/upload');
+      ? 'https://mcp.univoices.club/upload'
+      : getEnvVar('VITE_FILE_SERVICE_URL', 'https://mcp.univoices.club/upload');
     return `${uploadBaseUrl}/${type}`;
   }
 };

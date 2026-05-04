@@ -37,7 +37,7 @@ export async function exec_step(
   let baseApiUrl;
   if (isProduction) {
     // Production environment uses remote MCP service directly
-    baseApiUrl = 'https://mcp.aio2030.fun/api/v1/rpc';
+    baseApiUrl = 'https://mcp.univoices.club/api/v1/rpc';
     console.log(`[exec_step] Using production MCP server: ${baseApiUrl}`);
       } else {
       // Development environment uses environment variables

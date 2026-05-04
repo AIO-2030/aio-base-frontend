@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
     proxy: {
       // Proxy MCP API requests to production environment server with HTTPS
       '/api/mcp': {
-        target: 'https://mcp.aio2030.fun',
+        target: 'https://mcp.univoices.club',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/mcp/, '/api/v1/rpc'),
@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => ({
       },
       // Proxy file service requests to production environment server with HTTPS
       '/api/files': {
-        target: 'https://mcp.aio2030.fun',
+        target: 'https://mcp.univoices.club',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api\/files/, '/api/v1'),
@@ -52,7 +52,7 @@ export default defineConfig(({ mode }) => ({
         connect-src 'self' blob: 
           http://localhost:* https://localhost:*
           http://127.0.0.1:* https://127.0.0.1:*
-          https://mcp.aio2030.fun https://*.aio2030.fun
+          https://mcp.univoices.club https://*.univoices.club
           https://icp0.io https://*.icp0.io
           https://icp-api.io https://ic0.app https://*.ic0.app
           https://openapi.emchub.ai https://*.emchub.ai
@@ -86,8 +86,13 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "declarations": path.resolve(__dirname, "./declarations"),
-      "@dfinity/identity": "@dfinity/identity"
+      "@dfinity/identity": "@dfinity/identity",
+      // Force react-dom to resolve from this workspace so Rollup finds it when
+      // bundling (react-router-dom may be hoisted to root node_modules)
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
+      "react-dom/client": path.resolve(__dirname, "./node_modules/react-dom/client"),
     },
+    dedupe: ["react", "react-dom", "react-dom/client"],
   },
   define: {
     // Make environment variables accessible to client code safely
@@ -99,6 +104,9 @@ export default defineConfig(({ mode }) => ({
   },
   optimizeDeps: {
     include: [
+      "react",
+      "react-dom",
+      "react-dom/client",
       "@dfinity/agent",
       "@dfinity/auth-client",
       "@dfinity/principal",

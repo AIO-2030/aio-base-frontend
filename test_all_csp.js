@@ -5,17 +5,17 @@ console.log('🔍 Testing All CSP Configurations\n');
 const testUrls = [
   {
     name: 'MCP Upload',
-    url: 'https://mcp.aio2030.fun/upload/mcp',
+    url: 'https://mcp.univoices.club/upload/mcp',
     expected: 'Should be allowed by CSP'
   },
   {
     name: 'MCP RPC',
-    url: 'https://mcp.aio2030.fun/api/v1/rpc/mcp/mcp_voice',
+    url: 'https://mcp.univoices.club/api/v1/rpc/mcp/mcp_voice',
     expected: 'Should be allowed by CSP'
   },
   {
     name: 'File Download',
-    url: 'https://mcp.aio2030.fun/api/v1?type=mcp&filename=test.mcp',
+    url: 'https://mcp.univoices.club/api/v1?type=mcp&filename=test.mcp',
     expected: 'Should be allowed by CSP'
   },
   {
@@ -41,8 +41,8 @@ function testCspConfiguration() {
     "https://localhost:*",
     "http://127.0.0.1:*",
     "https://127.0.0.1:*",
-    "https://mcp.aio2030.fun",
-    "https://*.aio2030.fun",
+    "https://mcp.univoices.club",
+    "https://*.univoices.club",
     "https://icp0.io",
     "https://*.icp0.io",
     "https://icp-api.io",
@@ -89,8 +89,8 @@ function testCspConfiguration() {
   });
   
   console.log('=== CSP VERIFICATION SUMMARY ===');
-  console.log('✅ CSP rules include mcp.aio2030.fun');
-  console.log('✅ CSP rules include *.aio2030.fun');
+  console.log('✅ CSP rules include mcp.univoices.club');
+  console.log('✅ CSP rules include *.univoices.club');
   console.log('✅ CSP rules include localhost for development');
   console.log('✅ CSP rules include ICP domains');
   console.log('');
@@ -133,19 +133,19 @@ function testUrlPatterns() {
   
   const patterns = [
     {
-      pattern: 'https://mcp.aio2030.fun',
+      pattern: 'https://mcp.univoices.club',
       testUrls: [
-        'https://mcp.aio2030.fun/upload/mcp',
-        'https://mcp.aio2030.fun/api/v1/rpc/mcp/mcp_voice',
-        'https://mcp.aio2030.fun/api/v1?type=mcp&filename=test.mcp'
+        'https://mcp.univoices.club/upload/mcp',
+        'https://mcp.univoices.club/api/v1/rpc/mcp/mcp_voice',
+        'https://mcp.univoices.club/api/v1?type=mcp&filename=test.mcp'
       ]
     },
     {
-      pattern: 'https://*.aio2030.fun',
+      pattern: 'https://*.univoices.club',
       testUrls: [
-        'https://mcp.aio2030.fun/upload/mcp',
-        'https://api.aio2030.fun/v1/test',
-        'https://files.aio2030.fun/download'
+        'https://mcp.univoices.club/upload/mcp',
+        'https://api.univoices.club/v1/test',
+        'https://files.univoices.club/download'
       ]
     }
   ];
@@ -169,7 +169,7 @@ function testCspFixSummary() {
   console.log('');
   console.log('Changes made:');
   console.log('- Removed old IP-based URLs: http://8.141.81.75:* https://8.141.81.75:*');
-  console.log('- Added new domain URLs: https://mcp.aio2030.fun https://*.aio2030.fun');
+  console.log('- Added new domain URLs: https://mcp.univoices.club https://*.univoices.club');
   console.log('- Ensured HTTPS-only for new domain');
   console.log('');
   console.log('This should resolve the CSP violation error:');

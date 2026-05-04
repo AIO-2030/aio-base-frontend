@@ -9,10 +9,10 @@
 ## Changes Made
 
 ### 1. Backend Service URLs Updated
-- **MCP API Service**: `http://8.141.81.75:8000/api/v1/rpc` → `https://mcp.aio2030.fun/api/v1/rpc`
-- **File Service**: `http://8.141.81.75:8001` → `https://mcp.aio2030.fun/api/v1`
-- **File Upload Service**: `http://8.141.81.75:8001/api/v1/upload/` → `https://mcp.aio2030.fun/api/v1/upload/`
-- **File Download Service**: `http://8.141.81.75:8001/api/v1/` → `https://mcp.aio2030.fun/api/v1/`
+- **MCP API Service**: `http://8.141.81.75:8000/api/v1/rpc` → `https://mcp.univoices.club/api/v1/rpc`
+- **File Service**: `http://8.141.81.75:8001` → `https://mcp.univoices.club/api/v1`
+- **File Upload Service**: `http://8.141.81.75:8001/api/v1/upload/` → `https://mcp.univoices.club/api/v1/upload/`
+- **File Download Service**: `http://8.141.81.75:8001/api/v1/` → `https://mcp.univoices.club/api/v1/`
 
 ### 2. Code Modifications
 
@@ -36,9 +36,9 @@
 
 ### HTTPS Configuration Test ✅
 ```
-Production MCP URL: https://mcp.aio2030.fun/api/v1/rpc
-Production File URL: https://mcp.aio2030.fun/api/v1
-Production Upload URL: https://mcp.aio2030.fun/api/v1/upload
+Production MCP URL: https://mcp.univoices.club/api/v1/rpc
+Production File URL: https://mcp.univoices.club/api/v1
+Production Upload URL: https://mcp.univoices.club/api/v1/upload
 MCP URL is HTTPS: true
 File URL is HTTPS: true
 Upload URL is HTTPS: true
@@ -48,20 +48,20 @@ Upload URL is HTTPS: true
 ```
 Scenario: ICP Production
   Frontend: https://scswk-paaaa-aaaau-abyaq-cai.icp0.io/ (HTTPS: true)
-  Backend: https://mcp.aio2030.fun/api/v1/rpc (HTTPS: true)
+  Backend: https://mcp.univoices.club/api/v1/rpc (HTTPS: true)
   Mixed Content Risk: NO
 
 Scenario: Local Development
   Frontend: http://localhost:8080 (HTTPS: false)
-  Backend: https://mcp.aio2030.fun/api/v1/rpc (HTTPS: true)
+  Backend: https://mcp.univoices.club/api/v1/rpc (HTTPS: true)
   Mixed Content Risk: NO
 ```
 
 ### Generated Endpoints ✅
 ```
-mcp/mcp_voice: https://mcp.aio2030.fun/api/v1/rpc/mcp/mcp_voice (HTTPS: true)
-mcp/mcp_text: https://mcp.aio2030.fun/api/v1/rpc/mcp/mcp_text (HTTPS: true)
-agent/test_agent: https://mcp.aio2030.fun/api/v1/rpc/agent/test_agent (HTTPS: true)
+mcp/mcp_voice: https://mcp.univoices.club/api/v1/rpc/mcp/mcp_voice (HTTPS: true)
+mcp/mcp_text: https://mcp.univoices.club/api/v1/rpc/mcp/mcp_text (HTTPS: true)
+agent/test_agent: https://mcp.univoices.club/api/v1/rpc/agent/test_agent (HTTPS: true)
 ```
 
 ## Files Modified
@@ -83,9 +83,9 @@ agent/test_agent: https://mcp.aio2030.fun/api/v1/rpc/agent/test_agent (HTTPS: tr
 
 ### Environment Variables (Development)
 ```bash
-VITE_AIO_MCP_API_URL=https://mcp.aio2030.fun/api/v1/rpc
-VITE_AIO_MCP_FILE_URL=https://mcp.aio2030.fun/api/v1
-VITE_DOWNLOAD_BASE_URL=https://mcp.aio2030.fun/api/v1
+VITE_AIO_MCP_API_URL=https://mcp.univoices.club/api/v1/rpc
+VITE_AIO_MCP_FILE_URL=https://mcp.univoices.club/api/v1
+VITE_DOWNLOAD_BASE_URL=https://mcp.univoices.club/api/v1
 ```
 
 ## Benefits
